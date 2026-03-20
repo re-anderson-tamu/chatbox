@@ -16,14 +16,18 @@ export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
       'Connect to Atlassian services, including Jira and Confluence, to access your project data and documentation.',
     ),
     url: 'https://mcp.atlassian.com/v1/mcp',
-  },
-
- 
+  }, 
   {
     id: 'land-trends',
     name: 'Land Trends',
     description: i18n.t('Access Texas Land Trends data, including land use change, population, and land value.'),
     url: 'https://data.txlandtrends.org/mcp',
+  },
+  {
+    id: 'proposal-tracker',
+    name: 'Proposal Tracker',
+    description: i18n.t('Access NRI proposal and project data and files.'),
+    url: 'https://proposals.nri.tamu.edu/mcp',
   },
 ]
 
