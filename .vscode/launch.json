@@ -2,10 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "command": "npm run dev",
+      "command": "pnpm run dev:debug",
       "name": "Dev",
       "request": "launch",
       "type": "node-terminal"
+    },
+    { "name": "Attach Main Process", "type": "node", "request": "attach", "port": 5858, "restart": true }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Electron",
+      "configurations": ["Dev", "Attach Main Process"]
     }
   ]
 }
