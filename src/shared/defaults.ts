@@ -136,7 +136,7 @@ export function settings(): Settings {
     },
     mcp: {
       servers: [],
-      enabledBuiltinServers: [],
+      enabledBuiltinServers: ['land-trends'],
     },
   }
 }
