@@ -1,15 +1,15 @@
-productName: Chatbox
+productName: NRI OAK
 appId: xyz.chatboxapp.app
 asar: true
 asarUnpack:
   - "**\\*.{node,dll}"
-  - "**/node_modules/libsql/**"
+  - '**/node_modules/libsql/**'
 files:
-  - "dist"
+  - 'dist'
   # - "!dist/**/*.map"
   # - "!dist/**/stats.html"
-  - "node_modules"
-  - "package.json"
+  - 'node_modules'
+  - 'package.json'
 
 afterSign: .erb/scripts/notarize.js
 afterPack: .erb/scripts/patch-libsql.cjs
