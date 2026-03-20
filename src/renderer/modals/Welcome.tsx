@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { AdaptiveModal } from '@/components/common/AdaptiveModal'
 import icon from '../static/icon.png'
 import { navigateToSettings } from './Settings'
+import platform from '@/platform'
+import { Link } from '@mui/material'
 
 const Welcome = NiceModal.create(() => {
   const { t } = useTranslation()
@@ -31,27 +33,35 @@ const Welcome = NiceModal.create(() => {
             <Image src={icon} w={86} h={86} />
             <Stack gap="3xs" align="center">
               <Title order={3}>OAK</Title>
-              <Text size="md">{t('An easy-to-use AI client app')}</Text>
+              <Text size="md">{t('AI with deep roots')}</Text>
             </Stack>
           </Stack>
 
           <List size="sm" c="chatbox-secondary" className="flex flex-col items-center">
-            <List.Item>{t('Supports a variety of advanced AI models')}</List.Item>
-            <List.Item>{t('All data is stored locally, ensuring privacy and rapid access')}</List.Item>
+            <List.Item>{t('Connects to TAMUS Models')}</List.Item>
+            <List.Item>{t('Incorporates NRI knowledge sources')}</List.Item>
             <List.Item>{t('Ideal for both work and educational scenarios')}</List.Item>
           </List>
         </Stack>
 
         <Paper shadow="none" radius="md" withBorder p="lg">
           <Stack gap="sm">
-            <Text className="text-center">{t('Select and configure an AI model provider')}</Text>
+            <Text className="text-center">{t('Please provide your AgriLife chat API Key')}</Text>
+            <Link
+              onClick={(e) => {
+                e.preventDefault()
+                platform.openLink('https://chat.ag.tamus.edu')
+              }}
+            >
+              Open AgriLife Chat
+            </Link>
             <Button
               size="lg"
               h={54}
               radius="md"
               classNames={{ root: '!outline-none', label: 'flex flex-col items-center justify-center' }}
               onClick={() => {
-                navigateToSettings('/provider/chatbox-ai')
+                navigateToSettings('/provider/agrilife')
                 modal.resolve('setup')
                 modal.hide()
               }}
