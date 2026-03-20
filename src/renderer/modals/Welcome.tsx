@@ -37,20 +37,19 @@ const Welcome = NiceModal.create(() => {
             </Stack>
           </Stack>
 
-          <List size="sm" c="chatbox-secondary" className="flex flex-col items-center">
+          <List size="sm" c="chatbox-secondary" className="flex flex-col items-left">
             <List.Item>{t('Connects to TAMUS Models')}</List.Item>
             <List.Item>{t('Incorporates NRI knowledge sources')}</List.Item>
-            <List.Item>{t('Ideal for both work and educational scenarios')}</List.Item>
           </List>
         </Stack>
 
         <Paper shadow="none" radius="md" withBorder p="lg">
           <Stack gap="sm">
-            <Text className="text-center">{t('Please provide your AgriLife chat API Key')}</Text>
-            <Link
+            <Text className="text-center">{t('Please provide your AgriLife Chat API key')}</Text>
+            <Link className="text-center" sx={{ cursor: 'pointer' }}
               onClick={(e) => {
                 e.preventDefault()
-                platform.openLink('https://chat.ag.tamus.edu')
+                platform.openLink('https://chat.ag.tamus.ai')
               }}
             >
               Open AgriLife Chat
@@ -71,9 +70,7 @@ const Welcome = NiceModal.create(() => {
           </Stack>
         </Paper>
 
-        <Button variant="transparent" c="chatbox-secondary" size="compact-md" onClick={onClose}>
-          {t('Setup later')}
-        </Button>
+       
       </Stack>
     </AdaptiveModal>
   )
