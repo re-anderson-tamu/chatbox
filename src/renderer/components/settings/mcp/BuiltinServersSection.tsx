@@ -3,7 +3,6 @@ import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useToggleMCPServer } from '@/hooks/mcp'
 import { BUILTIN_MCP_SERVERS, type BuildinMCPServerConfig } from '@/packages/mcp/builtin'
-import { useAutoValidate } from '@/stores/premiumActions'
 import { useMcpSettings } from '@/stores/settingsStore'
 
 const ServerCard: FC<{
@@ -35,16 +34,13 @@ const ServerCard: FC<{
 export const BuiltinServersSection: FC = () => {
   const { t } = useTranslation()
   const mcp = useMcpSettings()
-  const isPremium = useAutoValidate()
   const onEnabledChange = useToggleMCPServer()
   return (
     <>
       <Text size="sm" fw={600} mb={4}>
-        Chatbox {t('Builtin MCP Servers')}
+        {t('Builtin MCP Servers')}
       </Text>
-      <Text size="xs" c="chatbox-tertiary" mb={12}>
-        {t('One-click MCP servers for Chatbox AI subscribers')}
-      </Text>
+      
       <SimpleGrid type="container" cols={{ base: 1, '450px': 2, '800px': 3, '1200px': 4 }}>
         {BUILTIN_MCP_SERVERS.map((config) => (
           <ServerCard
@@ -52,7 +48,7 @@ export const BuiltinServersSection: FC = () => {
             config={config}
             enabled={mcp.enabledBuiltinServers.includes(config.id)}
             onEnabledChange={onEnabledChange}
-            accessible={isPremium}
+            accessible={true}
           />
         ))}
       </SimpleGrid>

@@ -1,4 +1,3 @@
-import { getLicenseKey } from '@/stores/settingActions'
 import type { MCPServerConfig } from './types'
 import i18n from '@/i18n'
 
@@ -11,20 +10,15 @@ export interface BuildinMCPServerConfig {
 
 export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
   {
-    id: 'fetch',
-    name: 'Fetch',
+    id: 'atlassian',
+    name: 'Atlassian',
     description: i18n.t(
-      'This server enables LLMs to retrieve and process content from web pages, converting HTML to markdown for easier consumption.'
+      'Connect to Atlassian services, including Jira and Confluence, to access your project data and documentation.',
     ),
-    url: 'https://mcp.chatboxai.app/fetch',
+    url: 'https://mcp.atlassian.com/v1/mcp',
   },
 
-  {
-    id: 'context7',
-    name: 'Context7',
-    description: i18n.t('Retrieves up-to-date documentation and code examples for any library.'),
-    url: 'https://mcp.chatboxai.app/context7',
-  },
+ 
   {
     id: 'land-trends',
     name: 'Land Trends',
@@ -33,12 +27,11 @@ export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
   },
 ]
 
-export function getBuiltinServerConfig(id: string, licenseKey?: string): MCPServerConfig | null {
+export function getBuiltinServerConfig(id: string): MCPServerConfig | null {
   const config = BUILTIN_MCP_SERVERS.find((s) => s.id === id)
   if (!config) {
     return null
   }
-  const license = licenseKey || getLicenseKey()
   return {
     id,
     name: config.name,
@@ -46,7 +39,6 @@ export function getBuiltinServerConfig(id: string, licenseKey?: string): MCPServ
     transport: {
       type: 'http',
       url: config.url,
-      headers: license ? { 'x-chatbox-license': license } : undefined,
     },
   }
 }
