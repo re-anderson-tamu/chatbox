@@ -28,7 +28,7 @@ import { featureFlags } from '@/utils/feature-flags'
 const ITEMS = [
   {
     key: 'chatbox-ai',
-    label: 'Chatbox AI',
+    label: 'NRI OAK AI',
     icon: <IconSparkles className="w-full h-full" />,
   },
   {

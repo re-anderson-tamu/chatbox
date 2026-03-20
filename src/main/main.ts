@@ -164,7 +164,7 @@ function createTray() {
     // gm convert ./iconTemplateRaw.png -colorspace gray -negate -threshold 50% -resize 64x64 -units PixelsPerInch -density 144 iconTemplate@2x.png
     iconPath = getAssetPath('iconTemplate.png')
   } else if (process.platform === 'win32') {
-    iconPath = getAssetPath('icon.ico')
+    iconPath = getAssetPath('icon-32x32.png')
   }
   tray = new Tray(iconPath)
   const contextMenu = Menu.buildFromTemplate([

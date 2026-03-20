@@ -28,9 +28,7 @@ export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
   {
     id: 'land-trends',
     name: 'Land Trends',
-    description: i18n.t(
-      'Access Texas land trend data, including land use change, conservation, and natural resource statistics.'
-    ),
+    description: i18n.t('Access Texas Land Trends data, including land use change, population, and land value.'),
     url: 'https://data.txlandtrends.org/mcp',
   },
 ]

@@ -83,23 +83,10 @@ export const LoginView = forwardRef<HTMLDivElement, LoginViewProps>(
             <Flex gap="md" align="center">
               <Image src={icon} w={48} h={48} />
             </Flex>
-            <Flex gap="xs" align="center">
-              <Text c="chatbox-tertiary" className="text-right">
-                {t('Continue with')}{' '}
-                <UnstyledButton onClick={onSwitchToLicenseKey}>
-                  <Flex gap="xxs" align="center">
-                    <Text span className="!text-chatbox-tint-brand">
-                      {t('license key')}
-                    </Text>
-                    <ScalableIcon icon={IconArrowRight} size={16} className="!text-chatbox-tint-brand" />
-                  </Flex>
-                </UnstyledButton>
-              </Text>
-            </Flex>
           </Flex>
           <Stack gap="0">
             <Title order={3} c="chatbox-primary">
-              {t('Welcome to Chatbox')}
+              {t('Welcome to NRI OAK')}
             </Title>
             <Text c="chatbox-tertiary">{t('Log in to your Chatbox account')}</Text>
           </Stack>
