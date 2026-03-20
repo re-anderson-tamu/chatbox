@@ -19,6 +19,20 @@ export const agrilife = defineProvider({
         contextWindow: 200_000,
         maxOutput: 64_000,
       },
+      {
+        modelId: 'protected.Claude Opus 4.5',
+        nickname: 'Opus 4.5',
+        capabilities: ['reasoning', 'tool_use'],
+        contextWindow: 200_000,
+        maxOutput: 64_000,
+      },
+      {
+        modelId: 'map-reviewer',
+        nickname: 'Map Reviewer',
+        capabilities: ['reasoning', 'tool_use'],
+        contextWindow: 200_000,
+        maxOutput: 64_000,
+      },
     ],
   },
   createModel: (config) => {
