@@ -10,3 +10,35 @@
 *.ttf   binary
 *.woff  binary
 *.woff2 binary
+*.psd   binary
+
+# ──────────────────────────────────────────────────
+# NRI fork: always keep our version on upstream merge
+# ──────────────────────────────────────────────────
+
+# Branding assets
+assets/icon.png                        merge=ours
+assets/icon-32x32.png                  merge=ours
+resources/icon-background.png          merge=ours
+resources/icon-background.psd          merge=ours
+resources/icon-foreground.png          merge=ours
+resources/icon-only.png                merge=ours
+resources/splash.png                   merge=ours
+resources/splash-dark.png              merge=ours
+resources/splash.psd                   merge=ours
+src/renderer/favicon.ico               merge=ours
+src/renderer/static/icon.png           merge=ours
+src/renderer/static/icons/providers/agrilife.png  merge=ours
+src/renderer/static/icons/providers/agrilife.psd  merge=ours
+
+# NRI-specific source files
+src/shared/providers/definitions/agrilife.ts          merge=ours
+src/shared/providers/definitions/models/agrilife.ts   merge=ours
+src/renderer/packages/mcp/electron-oauth-provider.ts  merge=ours
+src/renderer/packages/mcp/builtin.ts                  merge=ours
+
+# CI/CD & tooling
+azure-pipelines.yml                    merge=ours
+custom_win_sign.js                     merge=ours
+CLAUDE.md                             merge=ours
+.claude/settings.local.json            merge=ours
