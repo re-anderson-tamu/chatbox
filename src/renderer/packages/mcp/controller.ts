@@ -1,15 +1,25 @@
-import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
+import { UnauthorizedError, experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import type { ToolSet } from 'ai'
 import Emittery from 'emittery'
 import { isEqual } from 'lodash'
+import { ElectronOAuthProvider } from './electron-oauth-provider'
 import { IPCStdioTransport } from './ipc-stdio-transport'
 import type { MCPServerConfig, MCPServerStatus } from './types'
 
 type TransportConfig = MCPServerConfig['transport']
 type MCPClient = Awaited<ReturnType<typeof createMCPClient>>
 
-async function createClient(transportConfig: TransportConfig, name = 'chatbox-mcp-client'): Promise<MCPClient> {
+function isUnauthorizedError(err: unknown): boolean {
+  return err instanceof UnauthorizedError
+}
+
+async function createClient(
+  transportConfig: TransportConfig,
+  serverId: string,
+  serverName: string,
+  name = 'chatbox-mcp-client',
+): Promise<MCPClient> {
   if (transportConfig.type === 'stdio') {
     const transport = await IPCStdioTransport.create(transportConfig)
     let errorMessage = ''
@@ -32,6 +42,41 @@ async function createClient(transportConfig: TransportConfig, name = 'chatbox-mc
     }
   }
   if (transportConfig.type === 'http') {
+    // OAuth flow for secured HTTP endpoints (Electron only)
+    if (transportConfig.oauth && window.electronAPI) {
+      const authProvider = new ElectronOAuthProvider(serverId, serverName)
+      const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), {
+        requestInit: { headers: transportConfig.headers },
+        authProvider,
+      })
+      try {
+        return await createMCPClient({
+          name,
+          transport,
+          onUncaughtError(error: unknown) {
+            console.error('mcp:client:onUncaughtError', error)
+          },
+        })
+      } catch (err) {
+        if (isUnauthorizedError(err)) {
+          // Auth was initiated — browser has been opened. Wait for the deep-link callback.
+          const codePromise = authProvider.getCodePromise()
+          if (!codePromise) throw err
+          const code = await codePromise
+          await transport.finishAuth(code)
+          // Retry now that tokens are saved
+          return await createMCPClient({
+            name,
+            transport,
+            onUncaughtError(error: unknown) {
+              console.error('mcp:client:onUncaughtError', error)
+            },
+          })
+        }
+        throw err
+      }
+    }
+    // Plain HTTP (no OAuth)
     try {
       const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), {
         requestInit: { headers: transportConfig.headers },
@@ -66,7 +111,11 @@ export class MCPServer extends Emittery<{ status: MCPServerStatus }> {
   private client?: MCPClient
   private tools?: ToolSet
 
-  constructor(private readonly transportConfig: TransportConfig) {
+  constructor(
+    private readonly transportConfig: TransportConfig,
+    private readonly serverId: string,
+    private readonly serverName: string,
+  ) {
     super()
   }
 
@@ -85,7 +134,7 @@ export class MCPServer extends Emittery<{ status: MCPServerStatus }> {
     }
     this.status = { state: 'starting' }
     try {
-      this.client = await createClient(this.transportConfig)
+      this.client = await createClient(this.transportConfig, this.serverId, this.serverName)
       this.tools = await this.client.tools()
     } catch (err) {
       console.error('mcp:client:start', err)
@@ -130,7 +179,7 @@ export const mcpController = {
     if (!serverConfig.enabled) {
       return
     }
-    const server = new MCPServer(serverConfig.transport)
+    const server = new MCPServer(serverConfig.transport, serverConfig.id, serverConfig.name)
     this.servers.set(serverConfig.id, { instance: server, config: serverConfig })
 
     // 如果有订阅者，重新连接他们

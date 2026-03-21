@@ -1,3 +1,15 @@
+// URL.canParse was added in Chrome 120 / Node 19.9; Electron 26 predates that.
+if (typeof URL.canParse === 'undefined') {
+  URL.canParse = (url: string, base?: string): boolean => {
+    try {
+      new URL(url, base)
+      return true
+    } catch {
+      return false
+    }
+  }
+}
+
 import { SplashScreen } from '@capacitor/splash-screen'
 import '@mantine/core/styles.css'
 import '@mantine/spotlight/styles.css'

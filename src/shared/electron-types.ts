@@ -6,5 +6,6 @@ export interface ElectronIPC {
   onWindowFocused: (callback: () => void) => () => void
   onUpdateDownloaded: (callback: () => void) => () => void
   addMcpStdioTransportEventListener: (transportId: string, event: string, callback?: (...args: any[]) => void) => void
+  onMcpOAuthCallback: (callback: (code: string, state: string) => void) => () => void
   onNavigate: (callback: (path: string) => void) => () => void
 }

@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm check:*)"
+      "Bash(pnpm check:*)",
+      "Bash(pnpm ls:*)",
+      "Bash(find /c/GitRepos/chatbox -type f -name *mcp* -o -name *MCP*)",
+      "Bash(grep -r mcp: /c/GitRepos/chatbox/src/shared/types --include=*.ts)",
+      "Bash(grep -r mcp:stdio-transport /c/GitRepos/chatbox/src/preload --include=*.ts -B 2 -A 2)",
+      "Bash(grep -r \"getAvailableTools\\\\|getAvailableMcpTools\" /c/GitRepos/chatbox/src --include=*.ts --include=*.tsx)",
+      "Bash(node -e \"const pkg = require\\(''./node_modules/@modelcontextprotocol/sdk/package.json''\\); console.log\\(pkg.version\\)\")",
+      "Bash(node -e \"const fs = require\\(''fs''\\); const files = fs.readdirSync\\(''./node_modules/@modelcontextprotocol/sdk/dist/client/''\\); console.log\\(files.join\\(''\\\\n''\\)\\)\")",
+      "Bash(find node_modules/@modelcontextprotocol/sdk -name *.js -path */client/*)",
+      "Bash(node:*)",
+      "Bash(grep -rn OAuthClientProvider node_modules/@modelcontextprotocol/sdk/dist/cjs/ --include=*.d.ts)"
     ]
   }
 }

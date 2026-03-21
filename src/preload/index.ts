@@ -51,6 +51,11 @@ const electronHandler: ElectronIPC = {
       callback?.(...args)
     })
   },
+  onMcpOAuthCallback: (callback: (code: string, state: string) => void) => {
+    const listener = (_event: unknown, code: string, state: string) => callback(code, state)
+    ipcRenderer.on('mcp:oauth-callback', listener)
+    return () => ipcRenderer.off('mcp:oauth-callback', listener)
+  },
   onNavigate: (callback: (path: string) => void) => {
     const listener = (_event: unknown, path: string) => {
       callback(path)

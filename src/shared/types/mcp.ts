@@ -16,6 +16,7 @@ export type MCPTransportConfig =
       type: 'http'
       url: string
       headers?: Record<string, string>
+      oauth?: boolean
     }
 
 export type MCPServerStatus = {

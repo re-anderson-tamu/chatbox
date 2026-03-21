@@ -6,6 +6,7 @@ export interface BuildinMCPServerConfig {
   name: string
   description: string
   url: string
+  oauth?: boolean
 }
 
 export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
@@ -16,7 +17,8 @@ export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
       'Connect to Atlassian services, including Jira and Confluence, to access your project data and documentation.',
     ),
     url: 'https://mcp.atlassian.com/v1/mcp',
-  }, 
+    oauth: true,
+  },
   {
     id: 'land-trends',
     name: 'Land Trends',
@@ -28,6 +30,7 @@ export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
     name: 'Proposal Tracker',
     description: i18n.t('Access NRI proposal and project data and files.'),
     url: 'https://proposals.nri.tamu.edu/mcp',
+    oauth: true,
   },
 ]
 
@@ -43,6 +46,7 @@ export function getBuiltinServerConfig(id: string): MCPServerConfig | null {
     transport: {
       type: 'http',
       url: config.url,
+      oauth: config.oauth,
     },
   }
 }

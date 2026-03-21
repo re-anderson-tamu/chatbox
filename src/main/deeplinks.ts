@@ -13,6 +13,13 @@ export function handleDeepLink(mainWindow: BrowserWindow, link: string) {
     mainWindow.webContents.send('navigate-to', `/settings/mcp?install=${encodeURIComponent(encodedConfig)}`)
   }
 
+  // handle `chatbox://mcp/oauth-callback?code=...&state=...`
+  if (url.hostname === 'mcp' && url.pathname === '/oauth-callback') {
+    const code = url.searchParams.get('code') || ''
+    const state = url.searchParams.get('state') || ''
+    mainWindow.webContents.send('mcp:oauth-callback', code, state)
+  }
+
   // handle `chatbox://provider/import?config=`
   if (url.hostname === 'provider' && url.pathname === '/import') {
     const encodedConfig = url.searchParams.get('config') || ''
