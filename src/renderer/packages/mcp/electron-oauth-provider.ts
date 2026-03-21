@@ -1,25 +1,9 @@
 import type { OAuthClientInformation, OAuthClientMetadata, OAuthClientProvider, OAuthTokens } from '@ai-sdk/mcp'
 
-// Module-level registry: OAuth state value → resolver for the auth code
-const pendingCallbacks = new Map<string, (code: string) => void>()
-
-let callbackListenerInitialized = false
-
-function initCallbackListener() {
-  if (callbackListenerInitialized || !window.electronAPI?.onMcpOAuthCallback) return
-  callbackListenerInitialized = true
-  window.electronAPI.onMcpOAuthCallback((code, state) => {
-    const resolve = pendingCallbacks.get(state)
-    if (resolve) {
-      pendingCallbacks.delete(state)
-      resolve(code)
-    }
-  })
-}
-
 export class ElectronOAuthProvider implements OAuthClientProvider {
   private _codeVerifier?: string
   private _codePromise?: Promise<string>
+  private _redirectUrl?: string
   private readonly _state: string
 
   constructor(
@@ -27,16 +11,21 @@ export class ElectronOAuthProvider implements OAuthClientProvider {
     private readonly serverName: string,
   ) {
     this._state = crypto.randomUUID()
-    initCallbackListener()
-  }
-
-  // Provide our own state so we can match the callback to this provider instance
-  state(): string {
-    return this._state
   }
 
   get redirectUrl(): string {
-    return 'chatbox://mcp/oauth-callback'
+    // This is set asynchronously before the OAuth flow begins via init().
+    // Fall back to a placeholder — the actual URL is always resolved before use.
+    return this._redirectUrl || 'http://127.0.0.1/mcp/oauth-callback'
+  }
+
+  /**
+   * Must be called before the OAuth flow starts to resolve the localhost redirect URL.
+   */
+  async init() {
+    if (!this._redirectUrl) {
+      this._redirectUrl = await window.electronAPI.invoke('mcp:oauth-redirect-url')
+    }
   }
 
   get clientMetadata(): OAuthClientMetadata {
@@ -76,17 +65,9 @@ export class ElectronOAuthProvider implements OAuthClientProvider {
   }
 
   async redirectToAuthorization(authorizationUrl: URL) {
-    // Register callback before opening the browser to avoid any race condition
-    this._codePromise = new Promise<string>((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        pendingCallbacks.delete(this._state)
-        reject(new Error('OAuth flow timed out — browser window was closed or took too long'))
-      }, 5 * 60 * 1000)
-      pendingCallbacks.set(this._state, (code: string) => {
-        clearTimeout(timeoutId)
-        resolve(code)
-      })
-    })
+    // Ask the main process to wait for the OAuth callback on the localhost server.
+    // This promise resolves when the provider redirects back to our localhost URL.
+    this._codePromise = window.electronAPI.invoke('mcp:oauth-wait-callback', this._state)
     await window.electronAPI.invoke('openLink', authorizationUrl.toString())
   }
 
@@ -99,9 +80,14 @@ export class ElectronOAuthProvider implements OAuthClientProvider {
     return this._codeVerifier
   }
 
+  // Provide our own state so we can match the callback to this provider instance
+  state(): string {
+    return this._state
+  }
+
   /**
    * Returns the promise that resolves with the auth code once the user
-   * completes the browser-based OAuth flow and the deep link callback fires.
+   * completes the browser-based OAuth flow and the localhost callback fires.
    */
   getCodePromise(): Promise<string> | undefined {
     return this._codePromise

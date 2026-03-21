@@ -11,7 +11,16 @@
       "Bash(node -e \"const fs = require\\(''fs''\\); const files = fs.readdirSync\\(''./node_modules/@modelcontextprotocol/sdk/dist/client/''\\); console.log\\(files.join\\(''\\\\n''\\)\\)\")",
       "Bash(find node_modules/@modelcontextprotocol/sdk -name *.js -path */client/*)",
       "Bash(node:*)",
-      "Bash(grep -rn OAuthClientProvider node_modules/@modelcontextprotocol/sdk/dist/cjs/ --include=*.d.ts)"
+      "Bash(grep -rn OAuthClientProvider node_modules/@modelcontextprotocol/sdk/dist/cjs/ --include=*.d.ts)",
+      "Bash(grep -r \"onMcpOAuthCallback\\\\|mcp/oauth-callback\\\\|chatbox://\" /c/GitRepos/chatbox/src --include=*.ts --include=*.tsx --include=*.js)",
+      "Bash(grep -r \"setAsDefaultProtocolClient\\\\|registerProtocol\\\\|deep.?link\" /c/GitRepos/chatbox/src --include=*.ts --include=*.tsx --include=*.js)",
+      "Bash(grep -r \"localhost\\\\|3000\\\\|4000\\\\|5000\\\\|server\\\\.listen\" /c/GitRepos/chatbox/src --include=*.ts --include=*.tsx --include=*.js)",
+      "Bash(grep -r \"onNavigate\\\\|navigate-to\" /c/GitRepos/chatbox/src/renderer --include=*.ts --include=*.tsx)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist //FI \"PID eq 13900\")",
+      "Bash(tasklist /FI \"PID eq 13900\")",
+      "Bash(taskkill //PID 13900 //F)",
+      "Bash(taskkill /PID 13900 /F)"
     ]
   }
 }

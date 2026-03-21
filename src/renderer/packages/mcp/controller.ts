@@ -45,6 +45,7 @@ async function createClient(
     // OAuth flow for secured HTTP endpoints (Electron only)
     if (transportConfig.oauth && window.electronAPI) {
       const authProvider = new ElectronOAuthProvider(serverId, serverName)
+      await authProvider.init()
       const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), {
         requestInit: { headers: transportConfig.headers },
         authProvider,

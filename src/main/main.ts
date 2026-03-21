@@ -24,6 +24,7 @@ import { handleDeepLink } from './deeplinks'
 import { parseFile } from './file-parser'
 import Locale from './locales'
 import * as mcpIpc from './mcp/ipc-stdio-transport'
+import { closeOAuthCallbackServer, getOAuthRedirectUrl, waitForOAuthCallback } from './mcp/oauth-callback-server'
 import MenuBuilder from './menu'
 import * as proxy from './proxy'
 import {
@@ -484,6 +485,7 @@ if (!gotTheLock) {
           log.error('shortcut: failed to unregister', e)
         }
         mcpIpc.closeAllTransports()
+        closeOAuthCallbackServer()
         destroyTray()
       })
       app.on('before-quit', () => {
@@ -753,4 +755,14 @@ ipcMain.handle('window:close', () => {
 
 ipcMain.handle('window:is-maximized', () => {
   return mainWindow?.isMaximized()
+})
+
+// --------- MCP OAuth callback server ---------
+
+ipcMain.handle('mcp:oauth-redirect-url', async () => {
+  return getOAuthRedirectUrl()
+})
+
+ipcMain.handle('mcp:oauth-wait-callback', async (_event, state: string) => {
+  return waitForOAuthCallback(state)
 })
