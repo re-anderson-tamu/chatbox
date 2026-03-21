@@ -1,0 +1,274 @@
+# Azure Pipelines — NRI OAK (Electron)
+#
+# PIPELINE OVERVIEW
+# -----------------
+# Stage 1 · CI          — Runs on every push and PR: lint, type-check, unit tests, build check.
+# Stage 2 · Package     — Runs on main branch: builds the Windows installer and saves it as a
+#                         pipeline artifact so it can be downloaded from the Azure DevOps UI.
+# Stage 3 · Release     — Runs on version tags (v*): builds the installer and uploads it to
+#                         Azure Blob Storage so existing installs auto-update.
+#
+# WHAT "DEPLOYMENT" MEANS FOR AN ELECTRON APP
+# --------------------------------------------
+# There is no server to deploy to. The pipeline:
+#   1. Compiles the app with electron-vite
+#   2. Packages it into a Windows NSIS installer (.exe) via electron-builder
+#   3. Uploads the installer + a latest.yml update manifest to Azure Blob Storage
+# Installed copies of the app check the blob container at startup and download
+# any update automatically (via electron-updater).
+#
+# AZURE BLOB STORAGE STRUCTURE
+# ----------------------------
+# Container (e.g. "releases"):
+#   releases/
+#     latest/
+#       NRI OAK-1.2.3-Setup.exe          ← installer
+#       NRI OAK-1.2.3-Setup.exe.blockmap ← used by differential updater
+#       latest.yml                        ← update manifest checked by the app
+#     beta/
+#       NRI OAK-1.2.3-beta.1-Setup.exe
+#       beta.yml
+#
+# ONE-TIME SETUP STEPS
+# --------------------
+# 1. Create an Azure Storage account + blob container.
+#    - Enable "Allow Blob anonymous read access" if you want the container public,
+#      OR handle auth (see electron-updater docs on token auth).
+#    - Make the container public (Blob access level) so electron-updater can
+#      fetch latest.yml without credentials.
+#
+# 2. Update electron-builder.yml publish.url with your storage account and
+#    container name (replace YOUR_STORAGE_ACCOUNT and YOUR_CONTAINER).
+#
+# 3. Create an Azure DevOps Service Connection:
+#    - Project Settings → Service Connections → New → Azure Resource Manager
+#    - Name it "nri-oak-azure" (or update AZURE_SERVICE_CONNECTION below)
+#    - Grant it "Storage Blob Data Contributor" on the storage account
+#
+# 4. Create pipeline variables (Pipelines → this pipeline → Edit → Variables):
+#    - STORAGE_ACCOUNT_NAME  e.g. nrioak
+#    - CONTAINER_NAME        e.g. releases
+#    (Neither is a secret — they're part of the public download URL anyway.)
+#
+# TRIGGERING A RELEASE
+# --------------------
+# Push a version tag:
+#   git tag v1.2.3 && git push origin v1.2.3         → publishes to "latest" channel
+#   git tag v1.2.3-beta.1 && git push origin v1.2.3-beta.1  → "beta" channel
+#   git tag v1.2.3-alpha && git push origin v1.2.3-alpha    → "alpha" channel
+
+trigger:
+  branches:
+    include:
+      - main
+  tags:
+    include:
+      - 'v*'
+
+pr:
+  branches:
+    include:
+      - '*'
+
+variables:
+  NODE_VERSION: '22.x'
+  PNPM_VERSION: '10'
+  PNPM_STORE_PATH: $(Pipeline.Workspace)/.pnpm-store
+  # Name of the Azure DevOps Service Connection that has Storage Blob Data Contributor
+  # on your storage account. Create it in Project Settings → Service Connections.
+  AZURE_SERVICE_CONNECTION: 'nri-oak-azure'
+
+# ---------------------------------------------------------------------------
+# STAGE 1: CI — lint, type-check, test, build check
+# Runs on every push and every PR.
+# ---------------------------------------------------------------------------
+stages:
+  - stage: CI
+    displayName: 'CI: Lint, Type Check & Test'
+    jobs:
+      - job: Validate
+        displayName: Validate
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: NodeTool@0
+            displayName: Install Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - script: npm install -g pnpm@$(PNPM_VERSION)
+            displayName: Install pnpm
+
+          - task: Cache@2
+            displayName: Cache pnpm store
+            inputs:
+              key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+              restoreKeys: 'pnpm | "$(Agent.OS)"'
+              path: $(PNPM_STORE_PATH)
+
+          - script: pnpm config set store-dir $(PNPM_STORE_PATH)
+            displayName: Point pnpm at cache directory
+
+          - script: pnpm install --frozen-lockfile
+            displayName: Install dependencies
+
+          - script: pnpm run check:ci
+            displayName: Lint (Biome)
+
+          - script: pnpm run check
+            displayName: Type check (tsc --noEmit)
+
+          - script: pnpm test
+            displayName: Unit tests (Vitest)
+
+          # Verify the app actually compiles — catches build-only errors that
+          # linting and type-checking won't catch.
+          - script: pnpm run build
+            displayName: Build check (electron-vite build)
+
+  # ---------------------------------------------------------------------------
+  # STAGE 2: Package — build the Windows installer
+  # Runs only when CI passes on the main branch.
+  # The installer is saved as a pipeline artifact you can download from the UI.
+  # ---------------------------------------------------------------------------
+  - stage: Package
+    displayName: 'Package: Build Windows Installer'
+    dependsOn: CI
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job: Build_Windows
+        displayName: Build Windows installer
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: NodeTool@0
+            displayName: Install Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - script: npm install -g pnpm@$(PNPM_VERSION)
+            displayName: Install pnpm
+
+          - task: Cache@2
+            displayName: Cache pnpm store
+            inputs:
+              key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+              restoreKeys: 'pnpm | "$(Agent.OS)"'
+              path: $(PNPM_STORE_PATH)
+
+          - script: pnpm config set store-dir $(PNPM_STORE_PATH)
+            displayName: Point pnpm at cache directory
+
+          - script: pnpm install --frozen-lockfile
+            displayName: Install dependencies
+
+          # Build the installer without publishing.
+          # UPDATE_CHANNEL is needed so electron-builder can bake the correct
+          # auto-update URL (channel path) into the app-update.yml manifest
+          # embedded inside the installer.
+          - script: pnpm run build && npx electron-builder build --publish never --win
+            displayName: Build + package installer
+            env:
+              UPDATE_CHANNEL: latest
+
+          - task: PublishPipelineArtifact@1
+            displayName: Save installer as pipeline artifact
+            inputs:
+              targetPath: release/build
+              artifact: windows-installer
+              publishLocation: pipeline
+
+  # ---------------------------------------------------------------------------
+  # STAGE 3: Release — build + upload to Azure Blob Storage for auto-updates
+  # Runs only when a version tag (v*) is pushed.
+  # Requires:
+  #   - AZURE_SERVICE_CONNECTION variable (see top of file)
+  #   - STORAGE_ACCOUNT_NAME pipeline variable
+  #   - CONTAINER_NAME pipeline variable
+  # ---------------------------------------------------------------------------
+  - stage: Release
+    displayName: 'Release: Publish to Azure Blob Storage'
+    dependsOn: CI
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+    jobs:
+      - job: Publish_Windows
+        displayName: Publish Windows release
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: NodeTool@0
+            displayName: Install Node.js $(NODE_VERSION)
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - script: npm install -g pnpm@$(PNPM_VERSION)
+            displayName: Install pnpm
+
+          - task: Cache@2
+            displayName: Cache pnpm store
+            inputs:
+              key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+              restoreKeys: 'pnpm | "$(Agent.OS)"'
+              path: $(PNPM_STORE_PATH)
+
+          - script: pnpm config set store-dir $(PNPM_STORE_PATH)
+            displayName: Point pnpm at cache directory
+
+          - script: pnpm install --frozen-lockfile
+            displayName: Install dependencies
+
+          # Determine the update channel from the tag name:
+          #   v1.2.3        → latest
+          #   v1.2.3-beta.1 → beta
+          #   v1.2.3-alpha  → alpha
+          - bash: |
+              TAG="${BUILD_SOURCEBRANCH#refs/tags/}"
+              if [[ "$TAG" == *"-beta"* ]]; then
+                CHANNEL=beta
+              elif [[ "$TAG" == *"-alpha"* ]]; then
+                CHANNEL=alpha
+              else
+                CHANNEL=latest
+              fi
+              echo "Tag: $TAG → channel: $CHANNEL"
+              echo "##vso[task.setvariable variable=UPDATE_CHANNEL]$CHANNEL"
+            displayName: Determine update channel from tag
+
+          # Build the installer. --publish never because we handle the upload
+          # ourselves with az storage below (gives us more control over the
+          # destination path and avoids needing S3-style credentials).
+          - script: pnpm run build && npx electron-builder build --publish never --win
+            displayName: Build installer
+            env:
+              UPDATE_CHANNEL: $(UPDATE_CHANNEL)
+              STORAGE_ACCOUNT_NAME: $(STORAGE_ACCOUNT_NAME)
+              CONTAINER_NAME: $(CONTAINER_NAME)
+
+          # Upload everything in release/build/ to the channel subfolder in
+          # the blob container. The AzureCLI task authenticates via the service
+          # connection — no connection strings or keys needed.
+          #
+          # Files uploaded:
+          #   NRI OAK-x.y.z-Setup.exe          ← installer for x64
+          #   NRI OAK-x.y.z-Setup.exe.blockmap ← differential update map
+          #   latest.yml (or beta.yml)          ← update manifest the app polls
+          - task: AzureCLI@2
+            displayName: Upload release to Azure Blob Storage
+            inputs:
+              azureSubscription: $(AZURE_SERVICE_CONNECTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az storage blob upload-batch \
+                  --account-name "$(STORAGE_ACCOUNT_NAME)" \
+                  --destination "$(CONTAINER_NAME)/$(UPDATE_CHANNEL)" \
+                  --source "release/build" \
+                  --overwrite true \
+                  --auth-mode login
+
+          - task: PublishPipelineArtifact@1
+            displayName: Save release installer as pipeline artifact
+            inputs:
+              targetPath: release/build
+              artifact: windows-release-$(Build.SourceBranchName)
+              publishLocation: pipeline
