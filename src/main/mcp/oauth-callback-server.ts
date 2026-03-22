@@ -1,8 +1,10 @@
 import * as http from 'http'
 import log from 'electron-log/main'
 
+// Fixed port so the redirect URI is predictable and can be pre-registered with OAuth providers.
+const OAUTH_CALLBACK_PORT = 28107
+
 let server: http.Server | null = null
-let serverPort: number | null = null
 
 // Pending OAuth states: state → resolver
 const pendingStates = new Map<string, { resolve: (code: string) => void; reject: (err: Error) => void }>()
@@ -24,8 +26,8 @@ const ERROR_HTML = (msg: string) => `<!DOCTYPE html>
 </div></body></html>`
 
 function ensureServer(): Promise<number> {
-  if (server && serverPort) {
-    return Promise.resolve(serverPort)
+  if (server) {
+    return Promise.resolve(OAUTH_CALLBACK_PORT)
   }
 
   return new Promise((resolve, reject) => {
@@ -57,17 +59,10 @@ function ensureServer(): Promise<number> {
       res.end(SUCCESS_HTML)
     })
 
-    // Listen on a random available port
-    s.listen(0, '127.0.0.1', () => {
-      const addr = s.address()
-      if (typeof addr === 'object' && addr) {
-        serverPort = addr.port
-        server = s
-        log.info(`[OAuth] Callback server listening on http://127.0.0.1:${serverPort}`)
-        resolve(serverPort)
-      } else {
-        reject(new Error('Failed to get server address'))
-      }
+    s.listen(OAUTH_CALLBACK_PORT, '127.0.0.1', () => {
+      server = s
+      log.info(`[OAuth] Callback server listening on http://127.0.0.1:${OAUTH_CALLBACK_PORT}`)
+      resolve(OAUTH_CALLBACK_PORT)
     })
 
     s.on('error', (err) => {
@@ -117,7 +112,6 @@ export function closeOAuthCallbackServer() {
   if (server) {
     server.close()
     server = null
-    serverPort = null
     pendingStates.clear()
     log.info('[OAuth] Callback server closed')
   }

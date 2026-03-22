@@ -87,7 +87,7 @@ const ConfigForm: FC<{
     setTestingResult(null)
     trackEvent('test_mcp_server_connection', { type: config.transport.type })
     try {
-      const server = new MCPServer(config.transport)
+      const server = new MCPServer(config.transport, config.id, config.name)
       testingAbortController.current = new AbortController()
       await pTimeout(server.start(), {
         milliseconds: 5 * 60_000,
@@ -161,6 +161,17 @@ const ConfigForm: FC<{
               autosize
               minRows={3}
               {...form.getInputProps('transport.headers')}
+            />
+            <TextInput
+              label={t('OAuth Client ID')}
+              description={t('Required if the server does not support dynamic client registration')}
+              placeholder="your-client-id"
+              {...form.getInputProps('transport.oauthClientId')}
+            />
+            <TextInput
+              label={t('OAuth Client Secret')}
+              placeholder="your-client-secret"
+              {...form.getInputProps('transport.oauthClientSecret')}
             />
           </>
         )}

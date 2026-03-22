@@ -242,6 +242,8 @@ const MCPTransportConfigSchema = z.discriminatedUnion('type', [
     url: z.string(),
     headers: z.record(z.string(), z.string()).optional(),
     oauth: z.boolean().optional().catch(undefined),
+    oauthClientId: z.string().optional().catch(undefined),
+    oauthClientSecret: z.string().optional().catch(undefined),
   }),
 ])
 

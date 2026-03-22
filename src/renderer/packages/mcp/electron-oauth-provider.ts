@@ -9,6 +9,8 @@ export class ElectronOAuthProvider implements OAuthClientProvider {
   constructor(
     private readonly serverId: string,
     private readonly serverName: string,
+    private readonly preConfiguredClientId?: string,
+    private readonly preConfiguredClientSecret?: string,
   ) {
     this._state = crypto.randomUUID()
   }
@@ -39,6 +41,14 @@ export class ElectronOAuthProvider implements OAuthClientProvider {
   }
 
   async clientInformation(): Promise<OAuthClientInformation | undefined> {
+    // If a client ID was pre-configured (server doesn't support dynamic registration),
+    // always return it directly — skip the store.
+    if (this.preConfiguredClientId) {
+      return {
+        client_id: this.preConfiguredClientId,
+        client_secret: this.preConfiguredClientSecret,
+      }
+    }
     try {
       const json = await window.electronAPI.invoke('getStoreBlob', `mcp-oauth-client-${this.serverId}`)
       return json ? JSON.parse(json) : undefined
@@ -48,6 +58,8 @@ export class ElectronOAuthProvider implements OAuthClientProvider {
   }
 
   async saveClientInformation(info: OAuthClientInformation) {
+    // Don't overwrite pre-configured credentials
+    if (this.preConfiguredClientId) return
     await window.electronAPI.invoke('setStoreBlob', `mcp-oauth-client-${this.serverId}`, JSON.stringify(info))
   }
 

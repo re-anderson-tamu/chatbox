@@ -35,6 +35,8 @@ export type MCPServerConfigFormValues = MCPServerConfig<
       type: 'http'
       url: string
       headers?: string
+      oauthClientId?: string
+      oauthClientSecret?: string
     }
 >
 
@@ -53,6 +55,8 @@ export function getConfigFromFormValues(values: MCPServerConfigFormValues): MCPS
       type: values.transport.type,
       url: values.transport.url,
       headers: values.transport.headers ? envUtils.parse(values.transport.headers) : undefined,
+      oauthClientId: values.transport.oauthClientId || undefined,
+      oauthClientSecret: values.transport.oauthClientSecret || undefined,
     }
   }
   return {
@@ -76,6 +80,8 @@ export function getFormValuesFromConfig(config: MCPServerConfig): MCPServerConfi
       type: config.transport.type,
       url: config.transport.url,
       headers: config.transport.headers ? envUtils.stringify(config.transport.headers) : undefined,
+      oauthClientId: config.transport.oauthClientId,
+      oauthClientSecret: config.transport.oauthClientSecret,
     }
   }
   return {

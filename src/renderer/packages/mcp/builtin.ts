@@ -7,6 +7,8 @@ export interface BuildinMCPServerConfig {
   description: string
   url: string
   oauth?: boolean
+  oauthClientId?: string
+  oauthClientSecret?: string
 }
 
 export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
@@ -47,6 +49,8 @@ export function getBuiltinServerConfig(id: string): MCPServerConfig | null {
       type: 'http',
       url: config.url,
       oauth: config.oauth,
+      oauthClientId: config.oauthClientId,
+      oauthClientSecret: config.oauthClientSecret,
     },
   }
 }

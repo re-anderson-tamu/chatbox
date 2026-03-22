@@ -42,46 +42,22 @@ async function createClient(
     }
   }
   if (transportConfig.type === 'http') {
-    // OAuth flow for secured HTTP endpoints (Electron only)
-    if (transportConfig.oauth && window.electronAPI) {
-      const authProvider = new ElectronOAuthProvider(serverId, serverName)
+    // On Electron, always attach an OAuth provider so that any 401 triggers the OAuth flow automatically.
+    const useOAuth = !!window.electronAPI
+    const authProvider = useOAuth
+      ? new ElectronOAuthProvider(serverId, serverName, transportConfig.oauthClientId, transportConfig.oauthClientSecret)
+      : undefined
+    if (authProvider) {
       await authProvider.init()
-      const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), {
-        requestInit: { headers: transportConfig.headers },
-        authProvider,
-      })
-      try {
-        return await createMCPClient({
-          name,
-          transport,
-          onUncaughtError(error: unknown) {
-            console.error('mcp:client:onUncaughtError', error)
-          },
-        })
-      } catch (err) {
-        if (isUnauthorizedError(err)) {
-          // Auth was initiated — browser has been opened. Wait for the deep-link callback.
-          const codePromise = authProvider.getCodePromise()
-          if (!codePromise) throw err
-          const code = await codePromise
-          await transport.finishAuth(code)
-          // Retry now that tokens are saved
-          return await createMCPClient({
-            name,
-            transport,
-            onUncaughtError(error: unknown) {
-              console.error('mcp:client:onUncaughtError', error)
-            },
-          })
-        }
-        throw err
-      }
     }
-    // Plain HTTP (no OAuth)
+
+    const transportOptions = {
+      requestInit: { headers: transportConfig.headers },
+      ...(authProvider ? { authProvider } : {}),
+    }
+
     try {
-      const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), {
-        requestInit: { headers: transportConfig.headers },
-      })
+      const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), transportOptions)
       return await createMCPClient({
         name,
         transport,
@@ -90,18 +66,42 @@ async function createClient(
         },
       })
     } catch (err) {
-      console.error('Streamable HTTP connection failed', err)
-      return await createMCPClient({
-        name,
-        transport: {
-          type: 'sse',
-          url: transportConfig.url,
-          headers: transportConfig.headers,
-        },
-        onUncaughtError(error: unknown) {
-          console.error('mcp:client:onUncaughtError', error)
-        },
-      })
+      if (isUnauthorizedError(err) && authProvider) {
+        // OAuth was initiated — browser has been opened. Wait for the localhost callback.
+        const codePromise = authProvider.getCodePromise()
+        if (!codePromise) throw err
+        const code = await codePromise
+        const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), transportOptions)
+        await transport.finishAuth(code)
+        // Retry now that tokens are saved
+        return await createMCPClient({
+          name,
+          transport,
+          onUncaughtError(error: unknown) {
+            console.error('mcp:client:onUncaughtError', error)
+          },
+        })
+      }
+      // Not a 401, or no OAuth available — try SSE fallback
+      if (!isUnauthorizedError(err)) {
+        console.error('Streamable HTTP connection failed', err)
+        try {
+          return await createMCPClient({
+            name,
+            transport: {
+              type: 'sse',
+              url: transportConfig.url,
+              headers: transportConfig.headers,
+            },
+            onUncaughtError(error: unknown) {
+              console.error('mcp:client:onUncaughtError', error)
+            },
+          })
+        } catch {
+          // SSE fallback also failed — throw the original error
+        }
+      }
+      throw err
     }
   }
   throw new Error('Unknown transport type')

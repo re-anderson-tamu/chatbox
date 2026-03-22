@@ -17,6 +17,8 @@ export type MCPTransportConfig =
       url: string
       headers?: Record<string, string>
       oauth?: boolean
+      oauthClientId?: string
+      oauthClientSecret?: string
     }
 
 export type MCPServerStatus = {
