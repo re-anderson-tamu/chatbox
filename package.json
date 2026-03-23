@@ -1,6 +1,6 @@
 {
-  "name": "xyz.chatboxapp.ce",
-  "productName": "xyz.chatboxapp.ce",
+  "name": "edu.tamu.nri.oak",
+  "productName": "edu.tamu.nri.oak",
   "version": "0.0.1",
   "engines": {
     "node": ">=20.0.0 <23.0.0",

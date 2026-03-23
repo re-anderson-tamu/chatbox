@@ -1,11 +1,11 @@
 {
-  "name": "xyz.chatboxapp.ce",
-  "productName": "xyz.chatboxapp.ce",
+  "name": "edu.tamu.nri.oak",
+  "productName": "edu.tamu.nri.oak",
   "version": "1.19.1",
-  "description": "A desktop client for multiple cutting-edge AI models",
+  "description": "AI support for land, wildlife, and the people who protect them",
   "author": {
-    "name": "Mediocre Company",
-    "email": "hi@chatboxai.com",
+    "name": "Texas A&M NRI",
+    "email": "nri-web@ag.tamu.edu",
     "url": "https://github.com/chatboxai"
   },
   "main": "./dist/main/main.js",
