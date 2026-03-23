@@ -4,6 +4,15 @@ import { Image } from '@mantine/core'
 import type { ModelProvider } from '@shared/types'
 import { useProviders } from '@/hooks/useProviders'
 import CustomProviderIcon from '../CustomProviderIcon'
+// @ts-ignore - Vite asset import
+import nriIconPng from '../../static/icon.png'
+
+// Model icon fallback overrides — used by ModelIcon when no model-specific icon exists.
+// Separate from the provider PNG files (agrilife.png/tamu.png) shown in the provider settings list.
+export const modelIconOverrides: Record<string, string> = {
+  agrilife: nriIconPng,
+  tamu: nriIconPng,
+}
 
 // Use Vite's import.meta.glob to dynamically import all PNG files
 // Vite handles import.meta.glob at build time, even though TypeScript doesn't recognize it with commonjs module setting

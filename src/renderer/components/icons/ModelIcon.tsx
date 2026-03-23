@@ -1,7 +1,7 @@
-import { useComputedColorScheme } from '@mantine/core'
+import { Image, useComputedColorScheme } from '@mantine/core'
 import type { ModelProvider } from '@shared/types'
 import { renderModelIcon } from '@/utils/modelLogo'
-import ProviderIcon from './ProviderIcon'
+import { modelIconOverrides } from './ProviderImageIcon'
 
 interface ModelIconProps {
   modelId: string
@@ -43,9 +43,9 @@ export function ModelIcon({ modelId, providerId, size = 16, className }: ModelIc
     )
   }
 
-  // Fallback to ProviderIcon if no model-specific icon
-  if (providerId) {
-    return <ProviderIcon provider={providerId} size={size} className={className} />
+  // Fallback to model icon override (e.g. NRI logo for agrilife/tamu providers)
+  if (providerId && modelIconOverrides[providerId]) {
+    return <Image w={size} h={size} src={modelIconOverrides[providerId]} className={className} alt={String(providerId)} />
   }
 
   // Final fallback: first letter avatar

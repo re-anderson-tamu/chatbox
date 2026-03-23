@@ -47,6 +47,13 @@ export const agrilife = defineProvider({
         contextWindow: 200_000,
         maxOutput: 64_000,
       },
+      {
+        modelId: 'technical-consultant',
+        nickname: 'Programming Consultant',
+        capabilities: ['reasoning', 'tool_use'],
+        contextWindow: 200_000,
+        maxOutput: 64_000,
+      },
     ],
   },
   createModel: (config) => {
