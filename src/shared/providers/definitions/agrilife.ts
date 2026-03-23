@@ -4,7 +4,7 @@ import Agrilife from './models/agrilife'
 
 export const agrilife = defineProvider({
   id: ModelProviderEnum.Agrilife,
-  name: 'Agrilife',
+  name: 'AgriLife',
   type: ModelProviderType.OpenAI,
   urls: {
     website: 'https://agrilife.tamu.edu/',
@@ -49,6 +49,6 @@ export const agrilife = defineProvider({
     )
   },
   getDisplayName: (modelId, providerSettings) => {
-    return `Agrilife (${providerSettings?.models?.find((m) => m.modelId === modelId)?.nickname || modelId})`
+    return `AgriLife (${providerSettings?.models?.find((m) => m.modelId === modelId)?.nickname || modelId})`
   },
 })

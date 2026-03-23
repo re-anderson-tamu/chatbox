@@ -4,7 +4,7 @@ import type { ModelDependencies } from '../../../types/adapters'
 interface Options extends OpenAICompatibleSettings {}
 
 export default class Agrilife extends OpenAICompatible {
-  public name = 'Agrilife'
+  public name = 'AgriLife'
   public options: Options
   constructor(options: Omit<Options, 'apiHost'>, dependencies: ModelDependencies) {
     const apiHost = 'https://chat-api.ag.tamus.ai/openai'
