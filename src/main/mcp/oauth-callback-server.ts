@@ -1,4 +1,7 @@
+import * as fs from 'fs'
 import * as http from 'http'
+import * as path from 'path'
+import { app } from 'electron'
 import log from 'electron-log/main'
 
 // Fixed port so the redirect URI is predictable and can be pre-registered with OAuth providers.
@@ -9,20 +12,27 @@ let server: http.Server | null = null
 // Pending OAuth states: state → resolver
 const pendingStates = new Map<string, { resolve: (code: string) => void; reject: (err: Error) => void }>()
 
+const PAGE_STYLE = `font-family:system-ui,sans-serif;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;margin:0;background:#f5f5f5`
+const CARD_STYLE = `background:#fff;border-radius:12px;padding:40px 48px;text-align:center;box-shadow:0 2px 16px rgba(0,0,0,0.10);max-width:360px;width:100%`
+const LOGO_STYLE = `height:80px;margin-bottom:20px`
+const LOGO_URL = `https://nri.tamu.edu/img/logos/nri-black.png`
+
 const SUCCESS_HTML = `<!DOCTYPE html>
 <html><head><title>Authorization Complete</title></head>
-<body style="font-family:system-ui;display:flex;justify-content:center;align-items:center;height:100vh;margin:0">
-<div style="text-align:center">
-<h2>Authorization successful</h2>
-<p>You can close this tab</p>
+<body style="${PAGE_STYLE}">
+<div style="${CARD_STYLE}">
+<img src="${LOGO_URL}" alt="NRI Logo" style="${LOGO_STYLE}">
+<h2 style="margin:0 0 10px">Authorization successful</h2>
+<p style="margin:0;color:#555">You can close this tab</p>
 </div></body></html>`
 
 const ERROR_HTML = (msg: string) => `<!DOCTYPE html>
 <html><head><title>Authorization Error</title></head>
-<body style="font-family:system-ui;display:flex;justify-content:center;align-items:center;height:100vh;margin:0">
-<div style="text-align:center">
-<h2>Authorization failed</h2>
-<p>${msg}</p>
+<body style="${PAGE_STYLE}">
+<div style="${CARD_STYLE}">
+<img src="${LOGO_URL}" alt="NRI Logo" style="${LOGO_STYLE}">
+<h2 style="margin:0 0 10px">Authorization failed</h2>
+<p style="margin:0;color:#555">${msg}</p>
 </div></body></html>`
 
 function ensureServer(): Promise<number> {
