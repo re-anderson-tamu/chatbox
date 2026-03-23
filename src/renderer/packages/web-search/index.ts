@@ -7,6 +7,7 @@ import type WebSearch from './base'
 import { BingSearch } from './bing'
 import { BingNewsSearch } from './bing-news'
 import { ChatboxSearch } from './chatbox-search'
+import { DuckDuckGoSearch } from './duckduckgo'
 import { TavilySearch } from './tavily'
 
 const MAX_CONTEXT_ITEMS = 10
@@ -35,6 +36,9 @@ function getSearchProviders() {
       if (language !== 'zh-Hans') {
         selectedProviders.push(new BingNewsSearch()) // 国内无法使用
       }
+      break
+    case 'duckduckgo':
+      selectedProviders.push(new DuckDuckGoSearch())
       break
     case 'tavily':
       if (!settings.webSearch.tavilyApiKey) {

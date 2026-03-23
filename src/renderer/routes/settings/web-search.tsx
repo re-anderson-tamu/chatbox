@@ -54,6 +54,7 @@ export function RouteComponent() {
         data={[
           { value: 'build-in', label: 'Chatbox Search (Pro)' },
           { value: 'bing', label: 'Bing Search (Free)' },
+          { value: 'duckduckgo', label: 'DuckDuckGo (Free)' },
           { value: 'tavily', label: 'Tavily' },
         ]}
         value={extension.webSearch.provider}
@@ -75,6 +76,13 @@ export function RouteComponent() {
       {extension.webSearch.provider === 'build-in' && (
         <Text size="xs" c="chatbox-gray">
           {t('Chatbox Search is a paid feature with advanced capabilities and better performance.')}
+        </Text>
+      )}
+      {extension.webSearch.provider === 'duckduckgo' && (
+        <Text size="xs" c="chatbox-gray">
+          {t(
+            'DuckDuckGo Search is provided for free use without an API key, but results may vary and is subject to change by DuckDuckGo.'
+          )}
         </Text>
       )}
       {extension.webSearch.provider === 'bing' && (
@@ -117,7 +125,7 @@ export function RouteComponent() {
               {t('Check')}
             </Button>
           </Flex>
-          
+
           {typeof tavilyAvaliable === 'boolean' ? (
             tavilyAvaliable ? (
               <Text size="xs" c="chatbox-success">
@@ -129,7 +137,7 @@ export function RouteComponent() {
               </Text>
             )
           ) : null}
-          
+
           <Button
             variant="transparent"
             size="compact-xs"
@@ -148,8 +156,14 @@ export function RouteComponent() {
             <Stack gap="xs">
               <Flex align="center" gap="xs">
                 <Text size="sm">{t('Search Depth')}</Text>
-                <Tooltip label={t('The depth of the search. advanced search is tailored to retrieve the most relevant sources and content snippets for your query, while basic search provides generic content snippets from each source. Using "advanced" costs 2 credits per query.')}>
-                  <Text size="sm" c="gray">ⓘ</Text>
+                <Tooltip
+                  label={t(
+                    'The depth of the search. advanced search is tailored to retrieve the most relevant sources and content snippets for your query, while basic search provides generic content snippets from each source. Using "advanced" costs 2 credits per query.'
+                  )}
+                >
+                  <Text size="sm" c="gray">
+                    ⓘ
+                  </Text>
                 </Tooltip>
               </Flex>
               <Select
@@ -180,7 +194,9 @@ export function RouteComponent() {
               <Flex align="center" gap="xs">
                 <Text size="sm">{t('Max Results')}</Text>
                 <Tooltip label={t('Maximum number of results to return.')}>
-                  <Text size="sm" c="gray">ⓘ</Text>
+                  <Text size="sm" c="gray">
+                    ⓘ
+                  </Text>
                 </Tooltip>
               </Flex>
               <Select
@@ -219,7 +235,9 @@ export function RouteComponent() {
               <Flex align="center" gap="xs">
                 <Text size="sm">{t('Time Range')}</Text>
                 <Tooltip label={t('Time range of the search. For example, the last month.')}>
-                  <Text size="sm" c="gray">ⓘ</Text>
+                  <Text size="sm" c="gray">
+                    ⓘ
+                  </Text>
                 </Tooltip>
               </Flex>
               <Select
@@ -253,7 +271,9 @@ export function RouteComponent() {
               <Flex align="center" gap="xs">
                 <Text size="sm">{t('Include Raw Content')}</Text>
                 <Tooltip label={t('Include the raw content of each search result.')}>
-                  <Text size="sm" c="gray">ⓘ</Text>
+                  <Text size="sm" c="gray">
+                    ⓘ
+                  </Text>
                 </Tooltip>
               </Flex>
               <Select
