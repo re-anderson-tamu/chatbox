@@ -116,16 +116,13 @@ stages:
             displayName: Lint (Biome)
             enabled: 'false'
 
-          - script: pnpm exec tsr generate
-            displayName: Generate TanStack Router route tree
+          # Build first — electron-vite triggers the TanStack Router plugin,
+          # which generates the route tree files that tsc needs.
+          - script: pnpm run build
+            displayName: Build (electron-vite build)
 
           - script: pnpm run check
             displayName: Type check (tsc --noEmit)
-
-          # Verify the app actually compiles — catches build-only errors that
-          # linting and type-checking won't catch.
-          - script: pnpm run build
-            displayName: Build check (electron-vite build)
 
   # ---------------------------------------------------------------------------
   # STAGE 2: Package — build the Windows installer
