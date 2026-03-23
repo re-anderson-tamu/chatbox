@@ -1,4 +1,5 @@
-import { UnauthorizedError, experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
+import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
+import { UnauthorizedError } from '@modelcontextprotocol/sdk/client/auth.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import type { ToolSet } from 'ai'
 import Emittery from 'emittery'
