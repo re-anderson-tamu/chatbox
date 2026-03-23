@@ -20,6 +20,7 @@ export enum ModelProviderEnum {
   XAI = 'xAI',
   OpenRouter = 'openrouter',
   Agrilife = 'agrilife',
+  Tamu = 'tamu',
   Custom = 'custom',
 }
 

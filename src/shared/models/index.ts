@@ -23,6 +23,7 @@ export const aiProviderNameHash: Record<ModelProviderEnum, string> = {
   [ModelProviderEnum.XAI]: 'xAI API',
   [ModelProviderEnum.OpenRouter]: 'OpenRouter API',
   [ModelProviderEnum.Agrilife]: 'Agrilife API',
+  [ModelProviderEnum.Tamu]: 'TAMU API',
   [ModelProviderEnum.Custom]: 'Custom Provider',
 }
 

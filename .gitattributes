@@ -29,11 +29,14 @@ resources/splash.psd                   merge=ours
 src/renderer/favicon.ico               merge=ours
 src/renderer/static/icon.png           merge=ours
 src/renderer/static/icons/providers/agrilife.png  merge=ours
+src/renderer/static/icons/providers/tamu.png  merge=ours
 src/renderer/static/icons/providers/agrilife.psd  merge=ours
 
 # NRI-specific source files
 src/shared/providers/definitions/agrilife.ts          merge=ours
+src/shared/providers/definitions/tamu.ts          merge=ours
 src/shared/providers/definitions/models/agrilife.ts   merge=ours
+src/shared/providers/definitions/models/tamu.ts   merge=ours
 src/renderer/packages/mcp/electron-oauth-provider.ts  merge=ours
 src/renderer/packages/mcp/builtin.ts                  merge=ours
 

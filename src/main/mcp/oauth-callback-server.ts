@@ -14,7 +14,7 @@ const SUCCESS_HTML = `<!DOCTYPE html>
 <body style="font-family:system-ui;display:flex;justify-content:center;align-items:center;height:100vh;margin:0">
 <div style="text-align:center">
 <h2>Authorization successful</h2>
-<p>You can close this tab and return to Chatbox.</p>
+<p>You can close this tab</p>
 </div></body></html>`
 
 const ERROR_HTML = (msg: string) => `<!DOCTYPE html>
