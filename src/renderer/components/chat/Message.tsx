@@ -23,11 +23,19 @@ import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import * as dateFns from 'date-fns'
 import { concat } from 'lodash'
+import type PhotoSwipe from 'photoswipe'
 import type { UIElementData } from 'photoswipe'
 import type React from 'react'
 import { type FC, forwardRef, type MouseEventHandler, memo, useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { ItemProps } from 'react-photoswipe-gallery'
 import { Gallery, Item as GalleryItem } from 'react-photoswipe-gallery'
+
+type ChildrenFnProps<T extends HTMLElement> = {
+  ref: (node: T | null) => void
+  open: (e: import('react').MouseEvent) => void
+  close: () => void
+}
 import Markdown from '@/components/Markdown'
 import { useIsSmallScreen } from '@/hooks/useScreenChange'
 import { cn } from '@/lib/utils'
@@ -628,7 +636,7 @@ const PictureGallery = memo(({ pictures, compact, onReport }: PictureGalleryProp
           outlineID: 'pswp__icn-download',
         },
         appendTo: 'bar',
-        onClick: async (_e, _el, pswp) => {
+        onClick: async (_e: MouseEvent, _el: HTMLElement, pswp: PhotoSwipe) => {
           const picture = pictures[pswp.currIndex]
           if (picture.storageKey) {
             const base64 = await storage.getBlob(picture.storageKey)
@@ -661,7 +669,7 @@ const PictureGallery = memo(({ pictures, compact, onReport }: PictureGalleryProp
               outlineID: 'pswp__icn-report',
             },
             appendTo: 'bar',
-            onClick: (_e, _el, pswp) => {
+            onClick: (_e: MouseEvent, _el: HTMLElement, pswp: PhotoSwipe) => {
               const picture = pictures[pswp.currIndex]
               pswp.close()
               onReport(picture)
@@ -678,7 +686,7 @@ const PictureGallery = memo(({ pictures, compact, onReport }: PictureGalleryProp
             <ImageInStorageGalleryItem key={p.storageKey} storageKey={p.storageKey} height={imageHeight} />
           ) : p.url ? (
             <GalleryItem key={p.url} original={p.url} thumbnail={p.url} width={1024} height={1024}>
-              {({ ref, open }) => (
+              {({ ref, open }: ChildrenFnProps<HTMLImageElement>) => (
                 <Img
                   src={p.url}
                   h={imageHeight}
@@ -686,7 +694,7 @@ const PictureGallery = memo(({ pictures, compact, onReport }: PictureGalleryProp
                   fit="contain"
                   radius="md"
                   ref={ref}
-                  onClick={open}
+                  onClick={(e) => open(e as unknown as import('react').MouseEvent)}
                   className="cursor-pointer"
                 />
               )}
@@ -718,7 +726,7 @@ const ImageInStorageGalleryItem = ({ storageKey, height }: { storageKey: string;
 
   return pic ? (
     <GalleryItem original={pic.data} thumbnail={pic.data} width={pic.width} height={pic.height}>
-      {({ ref, open }) => (
+      {({ ref, open }: ChildrenFnProps<HTMLImageElement>) => (
         <Img
           src={pic.data}
           h={height ?? fallbackHeight}
@@ -726,7 +734,7 @@ const ImageInStorageGalleryItem = ({ storageKey, height }: { storageKey: string;
           fit="contain"
           radius="md"
           ref={ref}
-          onClick={open}
+          onClick={(e) => open(e as unknown as import('react').MouseEvent)}
           className="cursor-pointer"
         />
       )}

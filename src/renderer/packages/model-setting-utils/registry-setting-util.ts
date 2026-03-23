@@ -39,7 +39,7 @@ export default class RegistrySettingUtil extends BaseConfig implements ModelSett
     const dependencies = await createModelDependencies()
 
     const modelInstance = definition.createModel({
-      settings: { provider: this.provider, modelId: model.modelId },
+      settings: { provider: this.provider, modelId: model.modelId } as Parameters<typeof definition.createModel>[0]['settings'],
       globalSettings: { providers: { [this.provider]: settings } } as Parameters<
         typeof definition.createModel
       >[0]['globalSettings'],
@@ -47,6 +47,7 @@ export default class RegistrySettingUtil extends BaseConfig implements ModelSett
       dependencies,
       providerSetting: settings,
       formattedApiHost: settings.apiHost || definition.defaultSettings?.apiHost || '',
+      formattedApiPath: '',
       model,
     })
 

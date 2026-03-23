@@ -1,3 +1,4 @@
+import type { SegmentedControlProps } from '@mantine/core'
 import { SegmentedControl as MantineSegmentedControl } from '@mantine/core'
 
 export default function SegmentedControl({
@@ -9,7 +10,7 @@ export default function SegmentedControl({
   value: string
   onChange: (value: string) => void
   data: { label: string; value: string }[]
-}) {
+} & Omit<SegmentedControlProps, 'value' | 'onChange' | 'data'>) {
   return (
     <MantineSegmentedControl
       value={value}

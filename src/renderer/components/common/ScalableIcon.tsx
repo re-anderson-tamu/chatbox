@@ -11,5 +11,7 @@ export const ScalableIcon = forwardRef<SVGSVGElement, Props>((props, ref) => {
   const { icon: IconComponent, size = 16, ...others } = props
   const theme = useMantineTheme()
   const scale = theme.scale ?? 1
-  return <IconComponent ref={ref} size={size * scale} {...others} />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const AnyIcon = IconComponent as any
+  return <AnyIcon ref={ref} size={size * scale} {...others} />
 })

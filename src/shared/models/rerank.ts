@@ -1,5 +1,21 @@
 import type { QueryResult } from '@mastra/core/vector'
-import type { RerankerFunctionOptions, RerankResult } from '@mastra/rag/dist/rerank'
+
+interface RerankerFunctionOptions {
+  weights?: { semantic?: number; vector?: number; position?: number }
+  queryEmbedding?: number[]
+  topK?: number
+}
+
+interface RerankResult {
+  result: QueryResult
+  score: number
+  details: {
+    semantic: number
+    vector: number
+    position: number
+    rerankIndex?: number
+  }
+}
 import type { CohereClient } from 'cohere-ai'
 
 // Takes in a list of results from a vector store and reranks them based on Cohere's rerank API

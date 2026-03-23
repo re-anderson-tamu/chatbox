@@ -2,7 +2,7 @@
   "compilerOptions": {
     "incremental": true,
     "target": "es2021",
-    "module": "nodenext",
+    "module": "ESNext",
     "lib": ["dom", "es2023"],
     "jsx": "react-jsx",
     "strict": true,
@@ -12,7 +12,7 @@
       "@/*": ["./src/renderer/*"],
       "@shared/*": ["./src/shared/*"]
     },
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
@@ -28,6 +28,10 @@
     "release",
     ".erb/dll",
     "ios",
-    "android"
+    "android",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
   ]
 }

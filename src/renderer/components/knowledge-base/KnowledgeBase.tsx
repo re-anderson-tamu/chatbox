@@ -1,5 +1,6 @@
 import { Alert, Button, Flex, Group, Paper, Pill, Stack, Text, Title } from '@mantine/core'
 import { SystemProviders } from '@shared/defaults'
+import { ModelProviderEnum } from '@shared/types'
 import type { KnowledgeBase, ModelProvider, ProviderModelInfo } from '@shared/types'
 import type { DocumentParserConfig, DocumentParserType } from '@shared/types/settings'
 import { parseKnowledgeBaseModelString } from '@shared/utils/knowledge-base-model-parser'
@@ -175,7 +176,7 @@ const KnowledgeBasePage: React.FC = () => {
       if (
         SystemProviders()
           .map((it) => it.id)
-          .includes(providerId as ModelProvider)
+          .includes(providerId as unknown as ModelProviderEnum)
       ) {
         return SystemProviders().find((it) => it.id === providerId)?.name
       }

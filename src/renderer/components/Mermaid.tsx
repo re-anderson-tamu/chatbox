@@ -12,6 +12,12 @@ import platform from '@/platform'
 import { useUIStore } from '@/stores/uiStore'
 import * as toastActions from '../stores/toastActions'
 
+type ChildrenFnProps<T extends HTMLElement> = {
+  ref: (node: T | null) => void
+  open: (e: import('react').MouseEvent) => void
+  close: () => void
+}
+
 export function MessageMermaid(props: { source: string; theme: 'light' | 'dark'; generating?: boolean }) {
   const { source, theme, generating } = props
 
@@ -168,7 +174,7 @@ export function SVGPreview(props: { xmlCode: string; className?: string; generat
     >
       <div className={cn('cursor-pointer my-2', className)}>
         <Item original={svgBase64} thumbnail={svgBase64} width={size.width} height={size.height}>
-          {({ ref, open }) => (
+          {({ ref, open }: ChildrenFnProps<HTMLImageElement>) => (
             <img
               className="!w-auto min-w-24"
               ref={ref}
@@ -176,7 +182,7 @@ export function SVGPreview(props: { xmlCode: string; className?: string; generat
               alt="svg preview"
               width={size.width}
               // height={size.height}
-              onClick={open}
+              onClick={(e) => open(e as unknown as import('react').MouseEvent)}
             />
           )}
         </Item>

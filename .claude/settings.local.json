@@ -21,7 +21,11 @@
       "Bash(tasklist /FI \"PID eq 13900\")",
       "Bash(taskkill //PID 13900 //F)",
       "Bash(taskkill /PID 13900 /F)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(pnpm add:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)"
     ]
   }
 }
