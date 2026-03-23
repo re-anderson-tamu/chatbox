@@ -26,6 +26,20 @@ export const tamu = defineProvider({
         contextWindow: 200_000,
         maxOutput: 64_000,
       },
+      {
+        modelId: 'protected.Claude-Haiku-4.5',
+        nickname: 'Haiku 4.5',
+        capabilities: ['reasoning', 'tool_use'],
+        contextWindow: 200_000,
+        maxOutput: 64_000,
+      },
+      {
+        modelId: 'protected.gpt-5.2',
+        nickname: 'GPT 5.2',
+        capabilities: ['reasoning', 'tool_use'],
+        contextWindow: 400_000,
+        maxOutput: 128_000,
+      },
     ],
   },
   createModel: (config) => {
