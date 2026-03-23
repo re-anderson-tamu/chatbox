@@ -159,7 +159,7 @@ function Root() {
       <Grid container className="h-full">
         <Sidebar />
         <Box
-          className="h-full w-full"
+          className="h-full w-full relative"
           sx={{
             flexGrow: 1,
             ...(showSidebar
@@ -169,8 +169,21 @@ function Root() {
               : {}),
           }}
         >
+          <img
+            src="/top-background.png"
+            alt=""
+            className="absolute top-0 left-0 w-full h-auto pointer-events-none z-0 page-bg-image"
+          />
+          <img
+            src="/bottom-background.png"
+            alt=""
+            className="absolute left-0 w-full h-auto pointer-events-none z-0 page-bg-image"
+            style={{ bottom: '120px' }}
+          />
           <ErrorBoundary name="main">
-            <Outlet />
+            <div className="relative z-[1] h-full">
+              <Outlet />
+            </div>
           </ErrorBoundary>
         </Box>
       </Grid>

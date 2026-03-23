@@ -267,6 +267,13 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+.page-bg-image {
+  filter: contrast(3);
+}
+[data-mantine-color-scheme="dark"] .page-bg-image {
+  filter: invert(1) contrast(5);
+}
+
 .copilot-picker-scroll-area .mantine-ScrollArea-scrollbar {
   padding-left: var(--mantine-spacing-md);
   padding-right: var(--mantine-spacing-md);
