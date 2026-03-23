@@ -45,8 +45,10 @@ const Welcome = NiceModal.create(() => {
 
         <Paper shadow="none" radius="md" withBorder p="lg">
           <Stack gap="sm">
-            <Text className="text-center">{t('Please provide your AgriLife Chat API key')}</Text>
-            <Link className="text-center" sx={{ cursor: 'pointer' }}
+            <Text className="text-center">{t('To begin, please provide your AgriLife Chat API key')}</Text>
+            <Link
+              className="text-center"
+              sx={{ cursor: 'pointer' }}
               onClick={(e) => {
                 e.preventDefault()
                 platform.openLink('https://chat.ag.tamus.ai')
@@ -65,12 +67,10 @@ const Welcome = NiceModal.create(() => {
                 modal.hide()
               }}
             >
-              {t('Setup Provider')}
+              {t('Configure AgriLife Provider')}
             </Button>
           </Stack>
         </Paper>
-
-       
       </Stack>
     </AdaptiveModal>
   )
