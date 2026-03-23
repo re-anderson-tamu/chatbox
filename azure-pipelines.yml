@@ -76,7 +76,7 @@ variables:
   PNPM_STORE_PATH: $(Pipeline.Workspace)/.pnpm-store
   # Name of the Azure DevOps Service Connection that has Storage Blob Data Contributor
   # on your storage account. Create it in Project Settings → Service Connections.
-  AZURE_SERVICE_CONNECTION: 'nri-oak-azure'
+  AZURE_SERVICE_CONNECTION: 'Azure Resource Manager'
 
 # ---------------------------------------------------------------------------
 # STAGE 1: CI — lint, type-check, test, build check
