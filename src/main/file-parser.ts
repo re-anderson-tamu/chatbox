@@ -13,7 +13,7 @@ function decodeHtmlEntities(text: string): string {
   text = text.replace(/&#x([0-9A-Fa-f]+);/g, (match, hex) => {
     try {
       return String.fromCharCode(parseInt(hex, 16))
-    } catch (e) {
+    } catch {
       return match // Return original if conversion fails
     }
   })
@@ -22,7 +22,7 @@ function decodeHtmlEntities(text: string): string {
   text = text.replace(/&#(\d+);/g, (match, dec) => {
     try {
       return String.fromCharCode(parseInt(dec, 10))
-    } catch (e) {
+    } catch {
       return match // Return original if conversion fails
     }
   })

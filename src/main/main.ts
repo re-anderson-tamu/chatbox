@@ -18,6 +18,7 @@ import path from 'path'
 // @ts-expect-error - source-map-support doesn't have type definitions
 import * as sourceMapSupport from 'source-map-support'
 import type { ShortcutSetting } from 'src/shared/types'
+import { AppUpdater } from './app-updater'
 import * as analystic from './analystic-node'
 import * as autoLauncher from './autoLauncher'
 import { handleDeepLink } from './deeplinks'

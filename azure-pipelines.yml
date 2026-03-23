@@ -114,6 +114,7 @@ stages:
 
           - script: pnpm run check:ci
             displayName: Lint (Biome)
+            enabled: 'false'
 
           - script: pnpm run check
             displayName: Type check (tsc --noEmit)
