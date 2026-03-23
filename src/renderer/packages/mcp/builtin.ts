@@ -16,7 +16,7 @@ export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
     id: 'atlassian',
     name: 'Atlassian',
     description: i18n.t(
-      'Connect to Atlassian services, including Jira and Confluence, to access your project data and documentation.',
+      'Connect to Atlassian services, including Jira and Confluence, to access your project data and documentation.'
     ),
     url: 'https://mcp.atlassian.com/v1/mcp',
     oauth: true,
@@ -33,6 +33,7 @@ export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
     description: i18n.t('Access NRI proposal and project data and files.'),
     url: 'https://proposals.nri.tamu.edu/mcp',
     oauth: true,
+    oauthClientId: '28d1e5ec-081a-4593-b16a-be98fc9af974',
   },
 ]
 
