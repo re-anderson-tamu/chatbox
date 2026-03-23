@@ -116,6 +116,9 @@ stages:
             displayName: Lint (Biome)
             enabled: 'false'
 
+          - script: pnpm exec tsr generate
+            displayName: Generate TanStack Router route tree
+
           - script: pnpm run check
             displayName: Type check (tsc --noEmit)
 
