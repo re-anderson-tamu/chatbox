@@ -43,8 +43,8 @@ function RouteComponent() {
             <Image h={100} w={100} mah={'20vw'} maw={'20vw'} src={iconPNG} />
             <Stack flex={1} gap="xxs">
               <Flex justify="space-between" align="center" wrap="wrap" gap={isSmallScreen ? 'xs' : 'sm'} rowGap="xs">
-                <Title order={5} lh={1.5} lineClamp={1} title={`Chatbox v${version.version}`}>
-                  Chatbox {/\d/.test(version.version) ? `(v${version.version})` : ''}
+                <Title order={5} lh={1.5} lineClamp={1} title={`OAK v${version.version}`}>
+                  NRI OAK {/\d/.test(version.version) ? `(v${version.version})` : ''}
                 </Title>
 
                 <Button
@@ -99,52 +99,16 @@ function RouteComponent() {
 
           <List>
             <ListItem
-              icon={<BrandGithub className="w-full h-full" />}
-              title={t('Github')}
-              link="https://github.com/chatboxai/chatbox"
-              value="chatbox"
-            />
-            {/* <ListItem
-              icon={<BrandX className="w-full h-full" />}
-              title={t('X(Twitter)')}
-              link="https://x.com/ChatboxAI_HQ"
-              value="@ChatboxAI_HQ"
-            /> */}
-            <ListItem
-              icon={<BrandRedNote className="w-full h-full" />}
-              title={t('RedNote')}
-              link="https://www.xiaohongshu.com/user/profile/67b581b6000000000e01d11f"
-              value="@63844903136"
-            />
-            <ListItem icon={<BrandWechat className="w-full h-full" />} title={t('WeChat')} right={<WechatQRCode />} />
-          </List>
-
-          <List>
-            <ListItem
               icon={<IconHome className="w-full h-full" />}
               title={t('Homepage')}
               link={`https://chatboxai.app/redirect_app/homepage/${language}`}
             />
-            <ListItem
-              icon={<IconClipboard className="w-full h-full" />}
-              title={t('Survey')}
-              link={_i18n.language === 'zh-Hans' ? 'https://jsj.top/f/fcMYEa' : 'https://jsj.top/f/RUMbvY'}
-            />
-            <ListItem
-              icon={<IconPencil className="w-full h-full" />}
-              title={t('Feedback')}
-              link={`https://chatboxai.app/redirect_app/feedback/${language}`}
-            />
-            <ListItem
-              icon={<IconFileText className="w-full h-full" />}
-              title={t('Changelog')}
-              link={`https://chatboxai.app/${language.split('-')[0] || 'en'}/help-center/changelog`}
-            />
+
             <ListItem
               icon={<IconMail className="w-full h-full" />}
               title={t('E-mail')}
-              link={`mailto:hi@chatboxai.com`}
-              value="hi@chatboxai.com"
+              link={`mailto:nri-web@ag.tamu.edu`}
+              value="nri-web@ag.tamu.edu"
             />
             <ListItem
               icon={<IconMessage2 className="w-full h-full" />}
