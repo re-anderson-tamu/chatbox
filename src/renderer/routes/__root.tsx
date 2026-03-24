@@ -170,12 +170,12 @@ function Root() {
           }}
         >
           <img
-            src="/top-background.png"
+            src="top-background.png"
             alt=""
             className="absolute top-0 left-0 w-full h-auto pointer-events-none z-0 page-bg-image"
           />
           <img
-            src="/bottom-background.png"
+            src="bottom-background.png"
             alt=""
             className="absolute left-0 w-full h-auto pointer-events-none z-0 page-bg-image"
             style={{ bottom: '120px' }}
