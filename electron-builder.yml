@@ -54,6 +54,7 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   include: assets/installer.nsh
+  installerSidebar: assets/installer_sidebar.bmp
 
 linux:
   target:
