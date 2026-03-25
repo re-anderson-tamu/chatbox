@@ -35,6 +35,14 @@ export const BUILTIN_MCP_SERVERS: BuildinMCPServerConfig[] = [
     oauth: true,
     oauthClientId: '28d1e5ec-081a-4593-b16a-be98fc9af974',
   },
+  {
+    id: 'arcgis-portal',
+    name: 'Portal for ArcGIS',
+    description: i18n.t('Access NRI GIS data in Portal.'),
+    url: 'https://gis.nri.tamu.edu/mcp',
+    oauth: true,
+    oauthClientId: 'SmT24R7RPzOKLK07',
+  },
 ]
 
 export function getBuiltinServerConfig(id: string): MCPServerConfig | null {
