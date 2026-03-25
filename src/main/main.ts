@@ -181,7 +181,7 @@ function createTray() {
       accelerator: 'Command+Q',
     },
   ])
-  tray.setToolTip('OAK')
+  tray.setToolTip('Quercus AI')
   tray.setContextMenu(contextMenu)
   tray.on('double-click', showOrHideWindow)
   return tray

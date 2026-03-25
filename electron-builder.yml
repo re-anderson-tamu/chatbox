@@ -1,5 +1,5 @@
-productName: NRI OAK
-appId: edu.tamu.nri.oak
+productName: NRI Quercus
+appId: edu.tamu.nri.quercus
 asar: true
 asarUnpack:
   - "**\\*.{node,dll}"

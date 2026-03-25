@@ -22,11 +22,11 @@
 # Container (e.g. "releases"):
 #   releases/
 #     latest/
-#       NRI OAK-1.2.3-Setup.exe          ← installer
-#       NRI OAK-1.2.3-Setup.exe.blockmap ← used by differential updater
+#       NRI Quercus-1.2.3-Setup.exe          ← installer
+#       NRI Quercus-1.2.3-Setup.exe.blockmap ← used by differential updater
 #       latest.yml                        ← update manifest checked by the app
 #     beta/
-#       NRI OAK-1.2.3-beta.1-Setup.exe
+#       NRI Quercus-1.2.3-beta.1-Setup.exe
 #       beta.yml
 #
 # ONE-TIME SETUP STEPS
@@ -247,8 +247,8 @@ stages:
           # connection — no connection strings or keys needed.
           #
           # Files uploaded:
-          #   NRI OAK-x.y.z-Setup.exe          ← installer for x64
-          #   NRI OAK-x.y.z-Setup.exe.blockmap ← differential update map
+          #   NRI Quercus-x.y.z-Setup.exe          ← installer for x64
+          #   NRI Quercus-x.y.z-Setup.exe.blockmap ← differential update map
           #   latest.yml (or beta.yml)          ← update manifest the app polls
           - task: AzureCLI@2
             displayName: Upload release to Azure Blob Storage

@@ -86,7 +86,7 @@ export const LoginView = forwardRef<HTMLDivElement, LoginViewProps>(
           </Flex>
           <Stack gap="0">
             <Title order={3} c="chatbox-primary">
-              {t('Welcome to NRI OAK')}
+              {t('Welcome to NRI Quercus AI')}
             </Title>
             <Text c="chatbox-tertiary">{t('Log in to your Chatbox account')}</Text>
           </Stack>

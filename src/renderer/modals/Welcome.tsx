@@ -32,7 +32,7 @@ const Welcome = NiceModal.create(() => {
           <Stack gap="sm" align="center">
             <Image src={icon} w={86} h={86} />
             <Stack gap="3xs" align="center">
-              <Title order={3}>OAK</Title>
+              <Title order={3}>Quercus</Title>
               <Text size="md">{t('AI with deep roots')}</Text>
             </Stack>
           </Stack>

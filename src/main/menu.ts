@@ -56,17 +56,17 @@ export default class MenuBuilder {
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'OAK',
+      label: 'Quercus AI',
       submenu: [
         {
-          label: 'About OAK',
+          label: 'About Quercus AI',
           selector: 'orderFrontStandardAboutPanel:',
         },
         { type: 'separator' },
         { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
-          label: 'Hide OAK',
+          label: 'Hide Quercus AI',
           accelerator: 'Command+H',
           selector: 'hide:',
         },
