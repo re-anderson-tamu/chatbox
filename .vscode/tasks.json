@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Package Installer",
+      "type": "shell",
+      "command": "pnpm run build && npx electron-builder build --publish never --win",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "options": {
+        "shell": {
+          "executable": "cmd.exe",
+          "args": ["/c"]
+        },
+        "env": {
+          "UPDATE_CHANNEL": "latest"
+        }
+      }
+    }
+  ]
+}
