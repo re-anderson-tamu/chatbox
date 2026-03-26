@@ -169,6 +169,9 @@ stages:
             env:
               UPDATE_CHANNEL: latest
 
+          - bash: rm -rf release/build/win-unpacked
+            displayName: Remove win-unpacked intermediate directory
+
           - task: PublishPipelineArtifact@1
             displayName: Save installer as pipeline artifact
             inputs:
@@ -250,6 +253,9 @@ stages:
           #   NRI Quercus-x.y.z-Setup.exe          ← installer for x64
           #   NRI Quercus-x.y.z-Setup.exe.blockmap ← differential update map
           #   latest.yml (or beta.yml)          ← update manifest the app polls
+          - bash: rm -rf release/build/win-unpacked
+            displayName: Remove win-unpacked intermediate directory
+
           - task: AzureCLI@2
             displayName: Upload release to Azure Blob Storage
             inputs:
