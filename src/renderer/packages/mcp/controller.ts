@@ -57,8 +57,11 @@ async function createClient(
       ...(authProvider ? { authProvider } : {}),
     }
 
+    // Hoist transport so the catch block can reuse it for finishAuth.
+    // The first transport stores _resourceMetadataUrl from the 401 WWW-Authenticate header;
+    // a fresh transport would lose that hint and fall back to the wrong token endpoint.
+    const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), transportOptions)
     try {
-      const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), transportOptions)
       return await createMCPClient({
         name,
         transport,
@@ -72,12 +75,14 @@ async function createClient(
         const codePromise = authProvider.getCodePromise()
         if (!codePromise) throw err
         const code = await codePromise
-        const transport = new StreamableHTTPClientTransport(new URL(transportConfig.url), transportOptions)
+        // Reuse the original transport so _resourceMetadataUrl (captured from the 401 response) is preserved.
         await transport.finishAuth(code)
-        // Retry now that tokens are saved
+        // Retry with a fresh transport (original may have _abortController still set from start()).
+        // Tokens are now saved, so the new transport will authenticate without needing resource metadata.
+        const retryTransport = new StreamableHTTPClientTransport(new URL(transportConfig.url), transportOptions)
         return await createMCPClient({
           name,
-          transport,
+          transport: retryTransport,
           onUncaughtError(error: unknown) {
             console.error('mcp:client:onUncaughtError', error)
           },
