@@ -271,6 +271,17 @@ export const mcpController = {
     }
     return toolSet
   },
+
+  getToolTitles(): Record<string, string> {
+    const titles: Record<string, string> = {}
+    for (const [normalizedName, tool] of Object.entries(this.getAvailableTools())) {
+      const title = (tool as { title?: string }).title
+      if (title) {
+        titles[normalizedName] = title
+      }
+    }
+    return titles
+  },
 }
 
 const SERVER_NAME_REGEX = /^[A-Za-z0-9_-]+$/

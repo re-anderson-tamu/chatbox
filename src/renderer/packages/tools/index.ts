@@ -1,4 +1,5 @@
 import { t } from 'i18next'
+import { mcpController } from '../mcp/controller'
 
 export function getToolName(toolName: string): string {
   // Use translation keys that i18next cli can detect
@@ -17,5 +18,22 @@ export function getToolName(toolName: string): string {
     parse_link: t('Parse Link'),
   }
 
-  return toolNames[toolName] || toolName
+  if (toolNames[toolName]) {
+    return toolNames[toolName]
+  }
+
+  // MCP tools: prefer the title from the tool definition, fall back to parsing the name
+  if (toolName.startsWith('mcp__')) {
+    const mcpTitle = mcpController.getToolTitles()[toolName]
+    if (mcpTitle) {
+      return mcpTitle
+    }
+    const parts = toolName.split('__')
+    if (parts.length >= 3) {
+      const mcpToolName = parts.slice(2).join('_')
+      return mcpToolName.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    }
+  }
+
+  return toolName
 }
