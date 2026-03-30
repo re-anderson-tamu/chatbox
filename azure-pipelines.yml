@@ -19,12 +19,13 @@
 #
 # AZURE BLOB STORAGE STRUCTURE
 # ----------------------------
-# Container (e.g. "releases"):
+# Storage account: nriquercus
+# Container: releases
 #   releases/
 #     latest/
 #       NRI Quercus-1.2.3-Setup.exe          ← installer
 #       NRI Quercus-1.2.3-Setup.exe.blockmap ← used by differential updater
-#       latest.yml                        ← update manifest checked by the app
+#       latest.yml                           ← update manifest checked by the app
 #     beta/
 #       NRI Quercus-1.2.3-beta.1-Setup.exe
 #       beta.yml
@@ -46,9 +47,12 @@
 #    - Grant it "Storage Blob Data Contributor" on the storage account
 #
 # 4. Create pipeline variables (Pipelines → this pipeline → Edit → Variables):
-#    - STORAGE_ACCOUNT_NAME  e.g. nrioak
-#    - CONTAINER_NAME        e.g. releases
+#    - STORAGE_ACCOUNT_NAME  nriquercus
+#    - CONTAINER_NAME        releases
 #    (Neither is a secret — they're part of the public download URL anyway.)
+#    Optional (for code signing):
+#    - WIN_CERT_BASE64       base64-encoded .pfx certificate  [secret]
+#    - WIN_CERT_PASSWORD     certificate password              [secret]
 #
 # TRIGGERING A RELEASE
 # --------------------
@@ -164,10 +168,14 @@ stages:
           # UPDATE_CHANNEL is needed so electron-builder can bake the correct
           # auto-update URL (channel path) into the app-update.yml manifest
           # embedded inside the installer.
+          # WIN_CERT_BASE64 / WIN_CERT_PASSWORD are optional: if set (secret
+          # pipeline variables), custom_win_sign.js signs the installer.
           - script: pnpm run build && npx electron-builder build --publish never --win
             displayName: Build + package installer
             env:
               UPDATE_CHANNEL: latest
+              WIN_CERT_BASE64: $(WIN_CERT_BASE64)
+              WIN_CERT_PASSWORD: $(WIN_CERT_PASSWORD)
 
           - bash: rm -rf release/build/win-unpacked
             displayName: Remove win-unpacked intermediate directory
@@ -238,21 +246,29 @@ stages:
           # Build the installer. --publish never because we handle the upload
           # ourselves with az storage below (gives us more control over the
           # destination path and avoids needing S3-style credentials).
+          # WIN_CERT_BASE64 / WIN_CERT_PASSWORD are optional: if set (secret
+          # pipeline variables), custom_win_sign.js signs the installer.
           - script: pnpm run build && npx electron-builder build --publish never --win
             displayName: Build installer
             env:
               UPDATE_CHANNEL: $(UPDATE_CHANNEL)
               STORAGE_ACCOUNT_NAME: $(STORAGE_ACCOUNT_NAME)
               CONTAINER_NAME: $(CONTAINER_NAME)
+              WIN_CERT_BASE64: $(WIN_CERT_BASE64)
+              WIN_CERT_PASSWORD: $(WIN_CERT_PASSWORD)
 
-          # Upload everything in release/build/ to the channel subfolder in
-          # the blob container. The AzureCLI task authenticates via the service
-          # connection — no connection strings or keys needed.
+          # Upload to the channel subfolder in the blob container.
+          # The AzureCLI task authenticates via the service connection —
+          # no connection strings or keys needed.
+          #
+          # Upload order matters: installer + blockmap must land before the
+          # .yml manifest. If the manifest arrives first, any update check
+          # that fires mid-upload will find a manifest but no installer.
           #
           # Files uploaded:
           #   NRI Quercus-x.y.z-Setup.exe          ← installer for x64
           #   NRI Quercus-x.y.z-Setup.exe.blockmap ← differential update map
-          #   latest.yml (or beta.yml)          ← update manifest the app polls
+          #   latest.yml (or beta.yml)              ← update manifest (uploaded last)
           - bash: rm -rf release/build/win-unpacked
             displayName: Remove win-unpacked intermediate directory
 
@@ -263,10 +279,29 @@ stages:
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
+                # Upload installer and blockmap first
                 az storage blob upload-batch \
                   --account-name "$(STORAGE_ACCOUNT_NAME)" \
                   --destination "$(CONTAINER_NAME)/$(UPDATE_CHANNEL)" \
                   --source "release/build" \
+                  --pattern "*.exe" \
+                  --overwrite true \
+                  --auth-mode login
+
+                az storage blob upload-batch \
+                  --account-name "$(STORAGE_ACCOUNT_NAME)" \
+                  --destination "$(CONTAINER_NAME)/$(UPDATE_CHANNEL)" \
+                  --source "release/build" \
+                  --pattern "*.blockmap" \
+                  --overwrite true \
+                  --auth-mode login
+
+                # Upload the manifest last so it only goes live once the installer is present
+                az storage blob upload \
+                  --account-name "$(STORAGE_ACCOUNT_NAME)" \
+                  --container-name "$(CONTAINER_NAME)" \
+                  --name "$(UPDATE_CHANNEL)/$(UPDATE_CHANNEL).yml" \
+                  --file "release/build/$(UPDATE_CHANNEL).yml" \
                   --overwrite true \
                   --auth-mode login
 

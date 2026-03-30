@@ -56,6 +56,7 @@ Uncomment the signing implementation that's already templated in the file. The l
 
 Changes:
 - Add `WIN_CERT_BASE64` and `WIN_CERT_PASSWORD` as env vars to the Package and Release build steps (sourced from pipeline secret variables)
+- Add an `AzureCLI@2` step after the package step to upload artifacts to blob storage
 - Update header comments to reflect the new signing setup
 - Update the blob storage structure comments to mention signed installers
 
@@ -64,12 +65,53 @@ Changes:
 |---|---|---|
 | `STORAGE_ACCOUNT_NAME` | No | Your storage account name |
 | `CONTAINER_NAME` | No | Your container name |
+| `UPDATE_CHANNEL` | No | e.g. `stable` or `beta` |
 | `WIN_CERT_BASE64` | Yes | Base64-encoded `.pfx` certificate |
 | `WIN_CERT_PASSWORD` | Yes | Certificate password |
+
+**Upload step (AzureCLI@2) — upload order matters:**
+
+Upload the installer files first, then `latest.yml` last. If `latest.yml` lands before the installer is present, any update check that fires mid-upload will try to download a file that doesn't exist yet.
+
+```yaml
+- task: AzureCLI@2
+  displayName: Upload installers to blob storage
+  inputs:
+    azureSubscription: your-service-connection
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      # Upload installer files first
+      az storage blob upload-batch \
+        --account-name $(STORAGE_ACCOUNT_NAME) \
+        --destination $(CONTAINER_NAME)/$(UPDATE_CHANNEL) \
+        --source dist/ \
+        --pattern "*.exe" \
+        --overwrite
+
+      # Upload latest.yml last so it only goes live once the installer is present
+      az storage blob upload \
+        --account-name $(STORAGE_ACCOUNT_NAME) \
+        --container-name $(CONTAINER_NAME) \
+        --name $(UPDATE_CHANNEL)/latest.yml \
+        --file dist/latest.yml \
+        --overwrite
+```
 
 ## 6. Update `electron-builder.yml` publish URL placeholder
 
 You'll provide the actual storage account name and container name, and I'll update the placeholder values.
+
+---
+
+## Staging: Deployment before auto-update
+
+Getting installers to a public URL is a prerequisite for auto-update but is independently useful (manual installs, sharing with testers). Consider validating this before wiring up the full auto-update flow:
+
+1. Complete steps 1, 3, and 5 (Azure setup, `electron-builder.yml` URL, pipeline upload step) — skip code signing if not ready yet
+2. Trigger a pipeline run and confirm the installer and `latest.yml` are reachable at `https://<account>.blob.core.windows.net/<container>/<channel>/`
+3. Do a manual install from the blob URL to confirm the file is valid
+4. Then proceed with step 2 (fix `app-updater.ts`) and step 4 (code signing) for the full auto-update experience
 
 ---
 

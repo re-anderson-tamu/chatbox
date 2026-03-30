@@ -79,6 +79,6 @@ publish:
   # Generic provider: electron-updater checks {url}/{channel}.yml for updates
   # and downloads installers from {url}/{filename}.
   # Files are uploaded to Azure Blob Storage by the release pipeline.
-  # Replace YOUR_STORAGE_ACCOUNT and YOUR_CONTAINER with your actual values.
+  # Files are served from https://nriquercus.blob.core.windows.net/releases/<channel>/
   - provider: generic
-    url: https://YOUR_STORAGE_ACCOUNT.blob.core.windows.net/YOUR_CONTAINER/${env.UPDATE_CHANNEL}
+    url: https://nriquercus.blob.core.windows.net/releases/${env.UPDATE_CHANNEL}
