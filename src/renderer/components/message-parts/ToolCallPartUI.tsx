@@ -25,6 +25,34 @@ import { cn } from '@/lib/utils'
 import { getToolName } from '@/packages/tools'
 import type { SearchResultItem } from '@/packages/web-search'
 import { ScalableIcon } from '../common/ScalableIcon'
+import Markdown from '../Markdown'
+
+/** If text looks like raw JSON, wrap it in a fenced code block for rendering. */
+function maybeWrapJson(text: string): string {
+  const trimmed = text.trim()
+  if ((trimmed.startsWith('{') || trimmed.startsWith('[')) && !trimmed.startsWith('```')) {
+    try {
+      JSON.parse(trimmed)
+      return '```json\n' + trimmed + '\n```'
+    } catch {
+      // not valid JSON — render as-is
+    }
+  }
+  return text
+}
+
+/** Extract plain text from an MCP tool result if it consists entirely of text content items. */
+function extractMcpText(result: unknown): string | null {
+  if (typeof result === 'string') return maybeWrapJson(result)
+  if (result && typeof result === 'object' && 'content' in result) {
+    const content = (result as { content: unknown }).content
+    if (Array.isArray(content) && content.length > 0 && content.every((item) => item?.type === 'text' && typeof item.text === 'string')) {
+      const joined = content.map((item) => item.text as string).join('\n\n')
+      return maybeWrapJson(joined)
+    }
+  }
+  return null
+}
 
 const ToolCallHeader: FC<{ part: MessageToolCallPart; action: ReactNode; onClick: () => void }> = (props) => {
   return (
@@ -196,7 +224,14 @@ const GeneralToolCallUI: FC<{ part: MessageToolCallPart }> = ({ part }) => {
                 </Text>
               </Group>
               <Box>
-                <Code block>{JSON.stringify(part.result, null, 2)}</Code>
+                {(() => {
+                  const text = extractMcpText(part.result)
+                  return text !== null ? (
+                    <Markdown>{text}</Markdown>
+                  ) : (
+                    <Code block>{JSON.stringify(part.result, null, 2)}</Code>
+                  )
+                })()}
               </Box>
             </Stack>
           )}
