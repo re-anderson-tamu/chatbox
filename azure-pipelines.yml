@@ -100,26 +100,7 @@ stages:
         pool:
           vmImage: windows-latest
         steps:
-          - task: NodeTool@0
-            displayName: Install Node.js $(NODE_VERSION)
-            inputs:
-              versionSpec: $(NODE_VERSION)
-
-          - script: npm install -g pnpm@$(PNPM_VERSION)
-            displayName: Install pnpm
-
-          - task: Cache@2
-            displayName: Cache pnpm store
-            inputs:
-              key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
-              restoreKeys: 'pnpm | "$(Agent.OS)"'
-              path: $(PNPM_STORE_PATH)
-
-          - script: pnpm config set store-dir $(PNPM_STORE_PATH)
-            displayName: Point pnpm at cache directory
-
-          - script: pnpm install --frozen-lockfile
-            displayName: Install dependencies
+          - template: .azure/install-deps.yml
 
           - script: pnpm run check:ci
             displayName: Lint (Biome)
@@ -148,26 +129,7 @@ stages:
         pool:
           vmImage: windows-latest
         steps:
-          - task: NodeTool@0
-            displayName: Install Node.js $(NODE_VERSION)
-            inputs:
-              versionSpec: $(NODE_VERSION)
-
-          - script: npm install -g pnpm@$(PNPM_VERSION)
-            displayName: Install pnpm
-
-          - task: Cache@2
-            displayName: Cache pnpm store
-            inputs:
-              key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
-              restoreKeys: 'pnpm | "$(Agent.OS)"'
-              path: $(PNPM_STORE_PATH)
-
-          - script: pnpm config set store-dir $(PNPM_STORE_PATH)
-            displayName: Point pnpm at cache directory
-
-          - script: pnpm install --frozen-lockfile
-            displayName: Install dependencies
+          - template: .azure/install-deps.yml
 
           # Build the installer without publishing.
           # UPDATE_CHANNEL is needed so electron-builder can bake the correct
@@ -226,26 +188,7 @@ stages:
         pool:
           vmImage: windows-latest
         steps:
-          - task: NodeTool@0
-            displayName: Install Node.js $(NODE_VERSION)
-            inputs:
-              versionSpec: $(NODE_VERSION)
-
-          - script: npm install -g pnpm@$(PNPM_VERSION)
-            displayName: Install pnpm
-
-          - task: Cache@2
-            displayName: Cache pnpm store
-            inputs:
-              key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
-              restoreKeys: 'pnpm | "$(Agent.OS)"'
-              path: $(PNPM_STORE_PATH)
-
-          - script: pnpm config set store-dir $(PNPM_STORE_PATH)
-            displayName: Point pnpm at cache directory
-
-          - script: pnpm install --frozen-lockfile
-            displayName: Install dependencies
+          - template: .azure/install-deps.yml
 
           # Determine the update channel from the tag name:
           #   v1.2.3        → latest
