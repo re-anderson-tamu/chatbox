@@ -3,10 +3,10 @@
 # PIPELINE OVERVIEW
 # -----------------
 # Stage 1 · CI          — Runs on every push and PR: lint, type-check, unit tests, build check.
-# Stage 2 · Package     — Runs on main branch: builds the Windows installer and saves it as a
-#                         pipeline artifact so it can be downloaded from the Azure DevOps UI.
-# Stage 3 · Release     — Runs on version tags (v*): builds the installer and uploads it to
-#                         Azure Blob Storage so existing installs auto-update.
+# Stage 2 · Package     — Runs on main branch: builds + signs the Windows installer and saves
+#                         it as a pipeline artifact so it can be downloaded from the ADO UI.
+# Stage 3 · Release     — Runs on version tags (v*): builds + signs the installer and uploads
+#                         it to Azure Blob Storage so existing installs auto-update.
 #
 # WHAT "DEPLOYMENT" MEANS FOR AN ELECTRON APP
 # --------------------------------------------
@@ -47,12 +47,17 @@
 #    - Grant it "Storage Blob Data Contributor" on the storage account
 #
 # 4. Create pipeline variables (Pipelines → this pipeline → Edit → Variables):
-#    - STORAGE_ACCOUNT_NAME  nriquercus
-#    - CONTAINER_NAME        releases
-#    (Neither is a secret — they're part of the public download URL anyway.)
-#    Optional (for code signing):
-#    - WIN_CERT_BASE64       base64-encoded .pfx certificate  [secret]
-#    - WIN_CERT_PASSWORD     certificate password              [secret]
+#    Blob storage (not secret):
+#    - STORAGE_ACCOUNT_NAME            nriquercus
+#    - CONTAINER_NAME                  releases
+#    Artifact Signing (not secret, except the client secret):
+#    - ARTIFACT_SIGNING_ENDPOINT       e.g. https://eus.codesigning.azure.net
+#    - ARTIFACT_SIGNING_ACCOUNT        your Artifact Signing account name
+#    - ARTIFACT_SIGNING_PROFILE        your certificate profile name
+#    - ARTIFACT_SIGNING_TENANT_ID      Entra ID tenant ID
+#    - ARTIFACT_SIGNING_CLIENT_ID      app registration client ID
+#    - ARTIFACT_SIGNING_CLIENT_SECRET  app registration client secret  [secret]
+#    See Plans/auto-update.md step 4 for how to create the app registration.
 #
 # TRIGGERING A RELEASE
 # --------------------
@@ -168,17 +173,32 @@ stages:
           # UPDATE_CHANNEL is needed so electron-builder can bake the correct
           # auto-update URL (channel path) into the app-update.yml manifest
           # embedded inside the installer.
-          # WIN_CERT_BASE64 / WIN_CERT_PASSWORD are optional: if set (secret
-          # pipeline variables), custom_win_sign.js signs the installer.
           - script: pnpm run build && npx electron-builder build --publish never --win
             displayName: Build + package installer
             env:
               UPDATE_CHANNEL: latest
-              WIN_CERT_BASE64: $(WIN_CERT_BASE64)
-              WIN_CERT_PASSWORD: $(WIN_CERT_PASSWORD)
 
           - bash: rm -rf release/build/win-unpacked
             displayName: Remove win-unpacked intermediate directory
+
+          # Sign the installer post-build using Azure Artifact Signing.
+          # Requires the "Artifact Signing" ADO marketplace extension (VisualStudioClient)
+          # and an app registration with "Artifact Signing Certificate Profile Signer" role.
+          # - task: ArtifactSigning@0
+          #   displayName: Sign installer with Azure Artifact Signing
+          #   inputs:
+          #     AzureTenantID: $(ARTIFACT_SIGNING_TENANT_ID)
+          #     AzureClientID: $(ARTIFACT_SIGNING_CLIENT_ID)
+          #     AzureClientSecret: $(ARTIFACT_SIGNING_CLIENT_SECRET)
+          #     Endpoint: $(ARTIFACT_SIGNING_ENDPOINT)
+          #     ArtifactSigningAccountName: $(ARTIFACT_SIGNING_ACCOUNT)
+          #     CertificateProfileName: $(ARTIFACT_SIGNING_PROFILE)
+          #     FilesFolder: release/build
+          #     FilesFolderFilter: exe
+          #     FilesFolderRecurse: false
+          #     FileDigest: SHA256
+          #     TimestampRfc3161: http://timestamp.acs.microsoft.com
+          #     TimestampDigest: SHA256
 
           - task: PublishPipelineArtifact@1
             displayName: Save installer as pipeline artifact
@@ -194,6 +214,7 @@ stages:
   #   - AZURE_SERVICE_CONNECTION variable (see top of file)
   #   - STORAGE_ACCOUNT_NAME pipeline variable
   #   - CONTAINER_NAME pipeline variable
+  #   - ARTIFACT_SIGNING_* variables (see top of file)
   # ---------------------------------------------------------------------------
   - stage: Release
     displayName: 'Release: Publish to Azure Blob Storage'
@@ -246,16 +267,34 @@ stages:
           # Build the installer. --publish never because we handle the upload
           # ourselves with az storage below (gives us more control over the
           # destination path and avoids needing S3-style credentials).
-          # WIN_CERT_BASE64 / WIN_CERT_PASSWORD are optional: if set (secret
-          # pipeline variables), custom_win_sign.js signs the installer.
           - script: pnpm run build && npx electron-builder build --publish never --win
             displayName: Build installer
             env:
               UPDATE_CHANNEL: $(UPDATE_CHANNEL)
               STORAGE_ACCOUNT_NAME: $(STORAGE_ACCOUNT_NAME)
               CONTAINER_NAME: $(CONTAINER_NAME)
-              WIN_CERT_BASE64: $(WIN_CERT_BASE64)
-              WIN_CERT_PASSWORD: $(WIN_CERT_PASSWORD)
+
+          - bash: rm -rf release/build/win-unpacked
+            displayName: Remove win-unpacked intermediate directory
+
+          # Sign the installer post-build using Azure Artifact Signing.
+          # Requires the "Artifact Signing" ADO marketplace extension (VisualStudioClient)
+          # and an app registration with "Artifact Signing Certificate Profile Signer" role.
+          # - task: ArtifactSigning@0
+          #   displayName: Sign installer with Azure Artifact Signing
+          #   inputs:
+          #     AzureTenantID: $(ARTIFACT_SIGNING_TENANT_ID)
+          #     AzureClientID: $(ARTIFACT_SIGNING_CLIENT_ID)
+          #     AzureClientSecret: $(ARTIFACT_SIGNING_CLIENT_SECRET)
+          #     Endpoint: $(ARTIFACT_SIGNING_ENDPOINT)
+          #     ArtifactSigningAccountName: $(ARTIFACT_SIGNING_ACCOUNT)
+          #     CertificateProfileName: $(ARTIFACT_SIGNING_PROFILE)
+          #     FilesFolder: release/build
+          #     FilesFolderFilter: exe
+          #     FilesFolderRecurse: false
+          #     FileDigest: SHA256
+          #     TimestampRfc3161: http://timestamp.acs.microsoft.com
+          #     TimestampDigest: SHA256
 
           # Upload to the channel subfolder in the blob container.
           # The AzureCLI task authenticates via the service connection —
@@ -269,9 +308,6 @@ stages:
           #   NRI Quercus-x.y.z-Setup.exe          ← installer for x64
           #   NRI Quercus-x.y.z-Setup.exe.blockmap ← differential update map
           #   latest.yml (or beta.yml)              ← update manifest (uploaded last)
-          - bash: rm -rf release/build/win-unpacked
-            displayName: Remove win-unpacked intermediate directory
-
           - task: AzureCLI@2
             displayName: Upload release to Azure Blob Storage
             inputs:
