@@ -1,11 +1,12 @@
 import { ActionIcon, Button, Flex, Group, Menu, Switch } from '@mantine/core'
 import { IconSettings2 } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
-import { type FC, type ReactNode, useState } from 'react'
+import { type FC, type ReactNode, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMCPServerStatus, useToggleMCPServer } from '@/hooks/mcp'
 import { navigateToSettings } from '@/modals/Settings'
 import { BUILTIN_MCP_SERVERS } from '@/packages/mcp/builtin'
+import * as toastActions from '@/stores/toastActions'
 import { useMcpSettings } from '@/stores/settingsStore'
 import { ScalableIcon } from '../common/ScalableIcon'
 import MCPStatus from './MCPStatus'
@@ -21,6 +22,16 @@ const ServerItem: FC<{
   onEnabledChange: (id: string, enabled: boolean) => void
 }> = ({ item, onEnabledChange }) => {
   const status = useMCPServerStatus(item.id)
+
+  useEffect(() => {
+    if (status?.needsReauth) {
+      toastActions.add(
+        `${item.name}: session expired. Toggle the server off and on to re-authenticate.`,
+        8000,
+      )
+    }
+  }, [status?.needsReauth, item.name])
+
   return (
     <Menu.Item
       c="chatbox-primary"

@@ -20,6 +20,7 @@ async function createClient(
   serverId: string,
   serverName: string,
   name = 'chatbox-mcp-client',
+  onAuthExpired?: () => void,
 ): Promise<MCPClient> {
   if (transportConfig.type === 'stdio') {
     const transport = await IPCStdioTransport.create(transportConfig)
@@ -67,6 +68,9 @@ async function createClient(
         transport,
         onUncaughtError(error: unknown) {
           console.error('mcp:client:onUncaughtError', error)
+          if (isUnauthorizedError(error)) {
+            onAuthExpired?.()
+          }
         },
       })
     } catch (err) {
@@ -85,6 +89,9 @@ async function createClient(
           transport: retryTransport,
           onUncaughtError(error: unknown) {
             console.error('mcp:client:onUncaughtError', error)
+            if (isUnauthorizedError(error)) {
+              onAuthExpired?.()
+            }
           },
         })
       }
@@ -101,6 +108,9 @@ async function createClient(
             },
             onUncaughtError(error: unknown) {
               console.error('mcp:client:onUncaughtError', error)
+              if (isUnauthorizedError(error)) {
+                onAuthExpired?.()
+              }
             },
           })
         } catch {
@@ -117,6 +127,7 @@ export class MCPServer extends Emittery<{ status: MCPServerStatus }> {
   private _status: MCPServerStatus = { state: 'idle' }
   private client?: MCPClient
   private tools?: ToolSet
+  private _authExpiredHandled = false
 
   constructor(
     private readonly transportConfig: TransportConfig,
@@ -139,9 +150,16 @@ export class MCPServer extends Emittery<{ status: MCPServerStatus }> {
     if (this.status.state !== 'idle') {
       return
     }
+    this._authExpiredHandled = false
     this.status = { state: 'starting' }
     try {
-      this.client = await createClient(this.transportConfig, this.serverId, this.serverName)
+      this.client = await createClient(
+        this.transportConfig,
+        this.serverId,
+        this.serverName,
+        'chatbox-mcp-client',
+        () => this._handleAuthExpired(),
+      )
       this.tools = await this.client.tools()
     } catch (err) {
       console.error('mcp:client:start', err)
@@ -149,6 +167,26 @@ export class MCPServer extends Emittery<{ status: MCPServerStatus }> {
       return
     }
     this.status = { state: 'running' }
+  }
+
+  private _handleAuthExpired() {
+    if (this._authExpiredHandled) return
+    this._authExpiredHandled = true
+    // Defer to avoid executing inside the MCP client's error callback
+    setTimeout(async () => {
+      try {
+        await this.client?.close()
+      } catch {
+        // ignore — client may already be in a broken state
+      }
+      this.client = undefined
+      this.tools = undefined
+      this.status = {
+        state: 'idle',
+        error: 'Session expired. Toggle the server off and on to re-authenticate.',
+        needsReauth: true,
+      }
+    }, 0)
   }
 
   async stop() {
