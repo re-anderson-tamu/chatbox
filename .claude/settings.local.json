@@ -27,7 +27,11 @@
       "Bash(grep:*)",
       "Bash(find:*)",
       "Bash(echo \"EXIT: $?\")",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebSearch",
+      "WebFetch(domain:marketplace.visualstudio.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:techcommunity.microsoft.com)"
     ]
   }
 }

@@ -172,7 +172,7 @@ electron-builder.env
 
 # Share VS Code settings
 # .vscode
-
+*.local.json
 
 **/routeTree.gen.ts
 
