@@ -15,45 +15,6 @@ export const defaultSessionsForEN: Session[] = [
     ].map(migrateMessage),
     starred: true,
   },
-  {
-    id: '6dafa15e-c72f-4036-ac89-33c09e875bdc',
-    name: 'Markdown 101 (Example)',
-    type: 'chat',
-    starred: true,
-    messages: [
-      {
-        id: '83240028-9d8b-43f2-87f2-a0a2be4dbf08',
-        role: 'system' as const,
-        content: 'You are a helpful assistant.',
-      },
-      {
-        id: '430a7c50-39be-4aa4-965b-2bc56383c6cf',
-        content: 'Write a demo table in markdown',
-        role: 'user' as const,
-      },
-      {
-        id: '899ff59b-cb8f-4b7c-aed0-26e082aed141',
-        content:
-          'Sure, here\'s a demo table in markdown:\n\n| Column 1 | Column 2 | Column 3 |\n| --- | --- | --- |\n| Row 1, Column 1 | Row 1, Column 2 | Row 1, Column 3 |\n| Row 2, Column 1 | Row 2, Column 2 | Row 2, Column 3 |\n| Row 3, Column 1 | Row 3, Column 2 | Row 3, Column 3 | \n\nIn this table, there are three columns labeled "Column 1", "Column 2", and "Column 3". There are also three rows, each with a value in each column. The "---" used in the second row is markdown syntax for a separator between the header row and the data rows.',
-        role: 'assistant' as const,
-        model: 'unknown',
-        generating: false,
-      },
-      {
-        id: '2ec392ba-7aaf-48fb-adb7-8a878a3cd843',
-        content: 'What is the formula for Fourier Transform? Using KaTeX syntax.',
-        role: 'user' as const,
-      },
-      {
-        id: 'fa204c2f-6138-4d3d-a132-a77b345587f5',
-        content:
-          'The formula for Fourier Transform is:\n\n$$\n\\hat{f}(\\xi) = \\int_{-\\infty}^{\\infty} f(x)\\, e^{-2\\pi ix\\xi} \\,dx\n$$\n\nwhere $\\hat{f}(\\xi)$ denotes the Fourier transform of $f(x)$.',
-        role: 'assistant' as const,
-        model: 'unknown',
-        generating: false,
-      },
-    ].map(migrateMessage),
-  },
 ]
 
 export const defaultSessionsForCN: Session[] = [
@@ -879,5 +840,296 @@ mindmap
   threads: [],
 }
 
+export const hotelTaxFormSession: Session = {
+  id: 'nri-demo-hotel-tax-form',
+  name: 'Hotel Tax Form',
+  type: 'chat',
+  starred: false,
+  messages: [
+    {
+      id: 'htf-sys-001',
+      role: 'system' as const,
+      content: 'You are a helpful assistant',
+    },
+    {
+      id: 'htf-user-001',
+      role: 'user' as const,
+      content: 'Where can I find the hotel tax form?',
+    },
+    {
+      id: 'htf-asst-001',
+      role: 'assistant' as const,
+      generating: false,
+      aiProvider: 'agrilife' as any,
+      model: 'protected.Claude Sonnet 4.5',
+      status: [],
+      timestamp: 1743000100000,
+      contentParts: [
+        {
+          type: 'text' as const,
+          text: "I'll help you search for the hotel tax form using Atlassian's search functionality.",
+        },
+        {
+          type: 'tool-call' as const,
+          state: 'result' as const,
+          toolCallId: 'htf-tc-001',
+          toolName: 'Rovo Search Jira and Confluence',
+          args: {
+            query: 'hotel tax form',
+          },
+          result: {
+            results: [
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/139171808',
+                title: 'Appendix',
+                text: 'Subject Matter Experts\n\nPurchasing Forms\nTax Exempt Form\n\nAgriLife Vendor Validation List\n\nPersonal Reimbursement Form\n\nAG-817 Missing Receipt Documentation Form\n\nPurchasing Form\n\nSample FedEx Airbill...Texas Hotel Tax Form\n\nTravel Receipt Requirements\n\n Version published after converting to the new editor quick-reference',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171808/Appendix',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/139171837',
+                title: 'Purchasing',
+                text: '--https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171808/Appendix#Tax-Exempt-Form-!  form and the hotel tax exempt...--https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171808/Appendix#Texas-Hotel-Tax-Form-!  form. Please remember to fill out and give to vendors/hotels prior to purchase/hotel stay',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171837/Purchasing',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/795541708',
+                title: 'Travel and Emburse',
+                text: 'REQUESTING TRAVEL\nWith your Traveler Profile, you may request travel via Emburse and book airfare, a hotel and/or rental car...You will need a copy of the Texas Hotel Tax  Form, if you travel in Texas',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/OPS/pages/795541708/Travel+and+Emburse',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/139171859',
+                title: 'OneCard, Travel Card Checklist',
+                text: 'When travelling in state, you must have the traveler submit a Texas State Sales and Use Tax Exemption Form (Tax Exempt Form...Business meals – If travel is within the state of Texas, a Texas State Sales and Use Tax Exemption Form (Tax Exempt Form',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171859/OneCard+Travel+Card+Checklist',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/798195795',
+                title: 'Vehicle Packets and Mileage Logs',
+                text: 'requiring signature prior to driving a vehicle), safety information, roadside assistance information, in case of an emergency/accident paperwork, and a mileage log booklet, along with extra purchasing forms',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/OPS/pages/798195795/Vehicle+Packets+and+Mileage+Logs',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/139171874',
+                title: 'UPS Shipment and Pickup',
+                text: 'We do not have a tax exempt account with UPS. UPS shipments are taxed (require a Tax Exempt Form!--https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171808/Appendix#Tax-Exempt-Form...Tax Exempt Form\n\n Version published after converting to the new editor',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171874/UPS+Shipment+and+Pickup',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/139171852',
+                title: 'Employee Reimbursement (Non-Travel-Related Expenses)',
+                text: 'Please ensure tax is not charged (Tax Exempt Form , (completed annually, as needed) and W-9 form',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171852/Employee+Reimbursement+Non-Travel-Related+Expenses',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/139171873',
+                title: 'FedEx Shipments',
+                text: 'We have two FedEx tax exempt numbers, one covers shipping costs and the other covers shipping supply purchases at a FedEx store...Tax exempt account number for shipping supply purchases at FedEx stores: 0135003661.\nYou will need a OneCard to purchase shipping supplies from a FedEx store. Keep the receipt for your allocation',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171873/FedEx+Shipments',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/975306753',
+                title: '2026-02-05 Biweekly Meeting notes',
+                text: 'Discussion topics\nRecently Completed\nFixed “Longleaf” tag typo and weird numbers in Draft Allocation table exports (In review, pending deployment)\nClean up of “Add MIPR” form to make it match layout of...improvement (Code in review, pending deployment)\nIn progress and Starting soon\nProposal Tracker export clean up and improvements\nAccount creation email update with   instructions\nDesign and plan proposal form',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/REPI/pages/975306753/2026-02-05+Biweekly+Meeting+notes',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+              {
+                id: 'ari:cloud:confluence:12822e23-4d0e-4c88-9bb7-fb05d6027b49:page/793807097',
+                title: 'Feature Backlog',
+                text: 'Solution:\nEffort:\nValue:\nDependencies:\nIssue:\nStatus: \n  Needs research\n\n   Track Taxes in Funding Module\nSource: Client Request\nProblem: The taxes amount changes throughout the year so REPI needs...a way to update this tax amount and keep track of the changes over time',
+                url: 'https://tamunri.atlassian.net/wiki/spaces/REPI/pages/793807097/Feature+Backlog',
+                type: 'page',
+                metadata: {
+                  cloudId: '12822e23-4d0e-4c88-9bb7-fb05d6027b49',
+                  searchScope: 'generic',
+                },
+              },
+            ],
+          },
+        },
+        {
+          type: 'text' as const,
+          text: 'I found several results related to hotel tax forms! The most relevant pages are:\n\n1. **Appendix** - This page appears to contain the actual "Texas Hotel Tax Form"\n   - Link: https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171808/Appendix\n\n2. **Purchasing** - This page mentions that you need to fill out and give the hotel tax exempt form to vendors/hotels prior to your hotel stay\n   - Link: https://tamunri.atlassian.net/wiki/spaces/OPS/pages/139171837/Purchasing\n\n3. **Travel and Emburse** - Notes that you will need a copy of the Texas Hotel Tax Form if you travel in Texas\n   - Link: https://tamunri.atlassian.net/wiki/spaces/OPS/pages/795541708/Travel+and+Emburse\n\nThe **Appendix page** seems to be the main location where the Texas Hotel Tax Form is stored. Would you like me to retrieve the full details of that page so you can see the form?',
+        },
+      ],
+    },
+  ].map(migrateMessage),
+}
+
+export const landTrendsSession: Session = {
+  id: 'nri-demo-land-trends',
+  name: 'Statewide Land Trends',
+  type: 'chat',
+  starred: false,
+  messages: [
+    {
+      id: 'lt-sys-001',
+      role: 'system' as const,
+      content: 'You are a helpful assistant.',
+    },
+    {
+      id: 'lt-user-001',
+      role: 'user' as const,
+      content: 'How much working land loss occurred in Texas from 1997 to 2022?',
+    },
+    {
+      id: 'lt-asst-001',
+      role: 'assistant' as const,
+      generating: false,
+      aiProvider: 'agrilife' as any,
+      model: 'protected.Claude Sonnet 4.5',
+      status: [],
+      timestamp: 1743000200000,
+      contentParts: [
+        {
+          type: 'text' as const,
+          text: "I'll help you find information about working land loss in Texas from 1997 to 2022. Let me get the statewide details for you.",
+        },
+        {
+          type: 'tool-call' as const,
+          state: 'result' as const,
+          toolCallId: 'lt-tc-001',
+          toolName: 'Get Statewide Details',
+          args: {
+            start_year: 1997,
+            end_year: 2022,
+          },
+          result: `# Texas Statewide Land Trends Summary\nLand Trends Data for Statewide\n\n## Land Use\n- **Cropland (1997):** 27,409,385 acres, MV: $16,605,418,964, PV: $4,986,419,222\n- **Grazing Land (1997):** 107,562,653 acres, MV: $47,970,392,387, PV: $4,664,126,764\n- **Other (1997):** 1,065,766 acres, MV: $1,272,273,434, PV: $141,742,390\n- **Timber (1997):** 7,482,323 acres, MV: $5,801,072,683, PV: $2,121,306,615\n- **Wildlife Management (1997):** 94,088 acres, MV: $56,046,242, PV: $7,289,226\n- **Cropland (2002):** 26,526,282 acres, MV: $21,456,711,187, PV: $4,445,457,168\n- **Grazing Land (2002):** 107,328,816 acres, MV: $66,483,950,265, PV: $4,887,979,331\n- **Other (2002):** 1,411,017 acres, MV: $1,516,127,533, PV: $176,463,970\n- **Timber (2002):** 7,575,831 acres, MV: $6,552,674,639, PV: $2,228,094,941\n- **Wildlife Management (2002):** 658,447 acres, MV: $1,024,983,929, PV: $35,078,040\n- **Cropland (2007):** 25,800,617 acres, MV: $31,976,684,525, PV: $4,638,383,274\n- **Grazing Land (2007):** 105,816,604 acres, MV: $122,211,309,867, PV: $5,277,251,528\n- **Other (2007):** 742,158 acres, MV: $1,561,249,584, PV: $120,152,233\n- **Timber (2007):** 7,729,687 acres, MV: $10,108,728,897, PV: $1,460,264,112\n- **Wildlife Management (2007):** 2,352,946 acres, MV: $4,535,642,965, PV: $147,081,203\n- **Cropland (2012):** 25,194,298 acres, MV: $39,110,760,186, PV: $5,997,641,377\n- **Grazing Land (2012):** 104,900,007 acres, MV: $159,607,551,275, PV: $5,459,622,821\n- **Other (2012):** 948,425 acres, MV: $2,487,210,284, PV: $150,116,133\n- **Timber (2012):** 7,931,763 acres, MV: $14,761,754,934, PV: $1,383,397,769\n- **Wildlife Management (2012):** 3,772,657 acres, MV: $8,057,206,491, PV: $232,312,452\n- **Cropland (2017):** 24,306,224 acres, MV: $48,401,445,394, PV: $5,059,079,640\n- **Grazing Land (2017):** 102,979,724 acres, MV: $193,765,753,668, PV: $5,525,912,702\n- **Other (2017):** 786,988 acres, MV: $2,140,764,391, PV: $134,841,610\n- **Timber (2017):** 8,012,855 acres, MV: $17,823,913,166, PV: $1,598,686,337\n- **Wildlife Management (2017):** 5,701,133 acres, MV: $14,475,318,604, PV: $365,755,006\n- **Cropland (2022):** 23,287,206 acres, MV: $64,897,551,133, PV: $4,995,010,412\n- **Grazing Land (2022):** 100,843,920 acres, MV: $296,787,150,960, PV: $5,670,808,123\n- **Other (2022):** 690,357 acres, MV: $3,924,803,610, PV: $146,261,533\n- **Timber (2022):** 8,028,042 acres, MV: $26,219,417,697, PV: $1,686,863,848\n- **Wildlife Management (2022):** 7,071,137 acres, MV: $30,879,318,282, PV: $477,169,393\n\n## Farm Ownership\n- **1-99 (1997):** 106,389 farms, 4,003,617 acres\n- **100-499 (1997):** 79,299 farms, 17,777,363 acres\n- **1000-1999 (1997):** 12,375 farms, 17,034,769 acres\n- **2000+ (1997):** 10,597 farms, 80,201,156 acres\n- **500-999 (1997):** 19,513 farms, 13,570,544 acres\n- **1-99 (2002):** 110,499 farms, 4,135,864 acres\n- **100-499 (2002):** 77,240 farms, 17,239,473 acres\n- **1000-1999 (2002):** 12,049 farms, 16,585,584 acres\n- **2000+ (2002):** 10,513 farms, 77,290,724 acres\n- **500-999 (2002):** 18,625 farms, 12,949,317 acres\n- **1-99 (2007):** 130,006 farms, 4,442,260 acres\n- **100-499 (2007):** 77,250 farms, 17,167,029 acres\n- **1000-1999 (2007):** 11,326 farms, 15,704,011 acres\n- **2000+ (2007):** 11,012 farms, 80,081,873 acres\n- **500-999 (2007):** 17,843 farms, 12,413,188 acres\n- **1-99 (2012):** 132,179 farms, 4,582,878 acres\n- **100-499 (2012):** 77,372 farms, 17,106,105 acres\n- **1000-1999 (2012):** 11,139 farms, 15,314,948 acres\n- **2000+ (2012):** 10,810 farms, 80,599,303 acres\n- **500-999 (2012):** 17,309 farms, 11,968,229 acres\n- **1-99 (2017):** 145,323 farms, 4,624,286 acres\n- **100-499 (2017):** 67,569 farms, 14,881,187 acres\n- **1000-1999 (2017):** 9,463 farms, 13,031,310 acres\n- **2000+ (2017):** 11,037 farms, 83,442,794 acres\n- **500-999 (2017):** 15,024 farms, 10,418,007 acres\n- **1-99 (2022):** 139,354 farms, 4,367,714 acres\n- **100-499 (2022):** 60,720 farms, 13,229,881 acres\n- **1000-1999 (2022):** 7,939 farms, 10,928,412 acres\n- **2000+ (2022):** 9,975 farms, 87,583,122 acres\n- **500-999 (2022):** 12,674 farms, 8,774,799 acres\n\n## Population\n- **1997:** 19,363,188 people\n- **2002:** 21,705,766 people\n- **2007:** 23,824,518 people\n- **2012:** 26,084,120 people\n- **2017:** 28,291,024 people\n- **2022:** 30,029,848 people`,
+        },
+        {
+          type: 'text' as const,
+          text: 'Based on the statewide data for Texas from 1997 to 2022, here\'s the working land loss:\n\n## Working Land Loss in Texas (1997-2022)\n\n**Total Working Land:**\n\n- **1997**: 143,614,215 acres (Cropland + Grazing Land + Timber + Wildlife Management)\n- **2022**: 139,230,305 acres\n\n**Net Loss: 4,383,910 acres** (approximately 3.1% decrease)\n\n## Breakdown by Category:\n\n1. **Cropland**: Lost 4,122,179 acres (27.4M → 23.3M)\n2. **Grazing Land**: Lost 6,718,733 acres (107.6M → 100.8M)\n3. **Timber**: Gained 545,719 acres (7.5M → 8.0M)\n4. **Wildlife Management**: Gained 6,977,049 acres (94K → 7.1M)\n\n## Key Observations:\n\n- Traditional working lands (cropland and grazing land) declined significantly, losing over **10.8 million acres** combined\n- The wildlife management category grew dramatically from just 94,088 acres to over 7 million acres\n- The "Other" category decreased from 1,065,766 acres to 690,357 acres\n- Population increased by over 10.6 million people (19.4M → 30.0M), a 55% increase\n- This population growth likely drove the conversion of working lands to urban and suburban development\n\nThe data shows that Texas lost approximately 4.4 million acres of working land over this 25-year period, with most losses occurring in traditional cropland and grazing land categories.',
+        },
+      ],
+    },
+  ].map(migrateMessage),
+}
+
+export const texasSolarFarmsSession: Session = {
+  id: 'nri-demo-texas-solar-farms',
+  name: 'Texas Solar Farms',
+  type: 'chat',
+  starred: false,
+  messages: [
+    {
+      id: 'tsf-sys-001',
+      role: 'system' as const,
+      content: 'You are a helpful assistant.',
+    },
+    {
+      id: 'tsf-user-001',
+      role: 'user' as const,
+      content: 'How many solar farms are in Texas, according to the photovoltaic database?',
+    },
+    {
+      id: 'tsf-asst-001',
+      role: 'assistant' as const,
+      generating: false,
+      aiProvider: 'agrilife' as any,
+      model: 'protected.Claude Sonnet 4.5',
+      status: [],
+      timestamp: 1743000300000,
+      contentParts: [
+        {
+          type: 'text' as const,
+          text: "I'll help you find information about solar farms in Texas from the photovoltaic database. Let me search for this data in the Portal.",
+        },
+        {
+          type: 'tool-call' as const,
+          state: 'result' as const,
+          toolCallId: 'tsf-tc-001',
+          toolName: 'Search Portal Content',
+          args: {
+            query: 'photovoltaic',
+          },
+          result: `Found 1 total results (showing up to 10):\n\n - US Large-Scale Solar Photovoltaic Database (USPVDB)\n**Type**: Feature Service\n**Service URL**: https://energy.usgs.gov/arcgis/rest/services/Hosted/uspvdbDyn/FeatureServer\nThe United States Large-Scale Solar Photovoltaic Database (USPVDB) provides the locations and array boundaries of U.S. photovoltaic (PV) facilities with capacity of 1 megawatt or more.`,
+        },
+        {
+          type: 'text' as const,
+          text: 'Let me get the details of this feature service.',
+        },
+        {
+          type: 'tool-call' as const,
+          state: 'result' as const,
+          toolCallId: 'tsf-tc-002',
+          toolName: 'Get Portal Item Details',
+          args: {
+            itemId: '628548c4cb894ac88fbdea37ce83d7c1',
+          },
+          result:
+            '**Title**: US Large-Scale Solar Photovoltaic Database (USPVDB)\n**ID**: aadb50f02c4b4935a21b52e18ed07031\n**Type**: Feature Service\n**Portal URL**: https://gis.nri.tamu.edu/portal/home/item.html?id=aadb50f02c4b4935a21b52e18ed07031\n**Service URL**: https://energy.usgs.gov/arcgis/rest/services/Hosted/uspvdbDyn/FeatureServer\n**Owner**: Addie.Smith\n**Created**: 2026-02-06\n**Modified**: 2026-02-27\n\n## Fields\n- `objectid`\n- `p_cap_ac`\n- `p_state` (String) [max 5]\nExamples: AK, AL',
+        },
+        {
+          type: 'text' as const,
+          text: 'Great! Now I can query the feature layer directly for Texas solar farms using the `p_state` field.',
+        },
+        {
+          type: 'tool-call' as const,
+          state: 'result' as const,
+          toolCallId: 'tsf-tc-002',
+          toolName: 'Query Feature Layer',
+          args: {
+            serviceUrl: 'https://energy.usgs.gov/arcgis/rest/services/Hosted/uspvdbDyn/FeatureServer/0',
+            where: "p_state = 'TX'",
+            outFields: 'objectid',
+            maxFeatures: 1000,
+          },
+          result:
+            "Query returned 153 feature(s) (WHERE: `p_state = 'TX'`):\n\n| objectid |\n| ---------- |\n| 4622 |\n| ... |\n| 5710 |",
+        },
+        {
+          type: 'text' as const,
+          text: "Based on the US Large-Scale Solar Photovoltaic Database (USPVDB) maintained by USGS, there are 153 solar farms in Texas (facilities with 1 MW or greater capacity).\n\nThese facilities range from small 1-2 MW community solar installations to large utility-scale projects exceeding 600 MW. The data shows:\n\n- The smallest facilities are around 1 MW (community solar and small ground-mount systems)\n- The largest facility in the dataset is the Aktina Solar project in Wharton County with 630 MW DC capacity (500 MW AC)\n- Most facilities use single-axis tracking systems\n- Several newer facilities include battery storage (hybrid projects)\n- The majority of these solar farms came online between 2017-2024, with a significant increase in installations after 2019\n\nThe database includes detailed information on each facility's location (county coordinates), capacity, technology type, tracking system, year commissioned, and other characteristics.",
+        },
+      ],
+    },
+  ].map(migrateMessage),
+}
+
 defaultSessionsForCN.unshift(imageCreatorSessionForCN, artifactSessionCN, mermaidSessionCN)
-defaultSessionsForEN.unshift(imageCreatorSessionForEN, artifactSessionEN, mermaidSessionEN)
+defaultSessionsForEN.unshift(texasSolarFarmsSession, landTrendsSession, hotelTaxFormSession)

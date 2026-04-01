@@ -31,7 +31,9 @@
       "WebSearch",
       "WebFetch(domain:marketplace.visualstudio.com)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:techcommunity.microsoft.com)"
+      "WebFetch(domain:techcommunity.microsoft.com)",
+      "mcp__claude_ai_Atlassian__getConfluencePage",
+      "mcp__claude_ai_Atlassian__updateConfluencePage"
     ]
   }
 }
