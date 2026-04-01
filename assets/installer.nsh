@@ -1,5 +1,16 @@
 !include LogicLib.nsh
 
+; Finish page: "Open Getting Started guide" checkbox (checked by default, installer only)
+!ifndef BUILD_UNINSTALLER
+  !define MUI_FINISHPAGE_SHOWREADME ""
+  !define MUI_FINISHPAGE_SHOWREADME_TEXT "Open Getting Started guide"
+  !define MUI_FINISHPAGE_SHOWREADME_FUNCTION "OpenGettingStarted"
+
+  Function OpenGettingStarted
+    ExecShell "open" "https://tamunri.atlassian.net/wiki/spaces/AI/pages/1060569089/Getting+Started+with+Quercus"
+  FunctionEnd
+!endif
+
 !macro customInit
   ; Check for x64 VC++ Redistributable (skip ARM64 check for now)
   ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Installed"
