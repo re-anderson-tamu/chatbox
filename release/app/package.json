@@ -1,6 +1,6 @@
 {
-  "name": "edu.tamu.nri.oak",
-  "productName": "edu.tamu.nri.oak",
+  "name": "edu.tamu.nri.quercus",
+  "productName": "edu.tamu.nri.quercus",
   "version": "1.20.0",
   "description": "AI support for land, wildlife, and the people who protect them",
   "author": {
