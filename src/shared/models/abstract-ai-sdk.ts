@@ -29,7 +29,7 @@ import type {
   StreamTextResult,
 } from '../types'
 import type { ModelDependencies } from '../types/adapters'
-import { ApiError, ChatboxAIAPIError } from './errors'
+import { ApiError, ChatboxAIAPIError, NetworkError } from './errors'
 import type { CallChatCompletionOptions, ModelInterface } from './types'
 
 const RETRY_CONFIG = {
@@ -37,6 +37,22 @@ const RETRY_CONFIG = {
   INITIAL_DELAY_MS: 1000,
   BACKOFF_FACTOR: 2,
 } as const
+
+// Polyfill for AbortSignal.any() — aborts when any of the given signals aborts.
+function anySignal(...signals: AbortSignal[]): AbortSignal {
+  if (typeof AbortSignal.any === 'function') {
+    return AbortSignal.any(signals)
+  }
+  const controller = new AbortController()
+  for (const signal of signals) {
+    if (signal.aborted) {
+      controller.abort(signal.reason)
+      return controller.signal
+    }
+    signal.addEventListener('abort', () => controller.abort(signal.reason), { once: true })
+  }
+  return controller.signal
+}
 
 function is5xxError(error: unknown): boolean {
   if (APICallError.isInstance(error)) {
@@ -485,12 +501,29 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
     options: CallChatCompletionOptions<T>,
     callSettings: CallSettings
   ): Promise<StreamTextResult> {
+    // 30 s without a chunk → surface as a NetworkError rather than hanging forever.
+    // This catches stalled TCP connections (common with laptop power management / WiFi).
+    const CHUNK_INACTIVITY_TIMEOUT_MS = 30_000
+
+    const timeoutController = new AbortController()
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined
+
+    const resetTimeout = () => {
+      clearTimeout(timeoutHandle)
+      timeoutHandle = setTimeout(() => timeoutController.abort(), CHUNK_INACTIVITY_TIMEOUT_MS)
+    }
+
+    // Combine the caller's abort signal with our inactivity timeout signal so either can stop the stream.
+    const combinedSignal = options.signal
+      ? anySignal(options.signal, timeoutController.signal)
+      : timeoutController.signal
+
     const result = streamText({
       model,
       messages: coreMessages,
       stopWhen: stepCountIs(options.maxSteps || Number.MAX_SAFE_INTEGER),
       tools: options.tools,
-      abortSignal: options.signal,
+      abortSignal: combinedSignal,
       ...callSettings,
     })
 
@@ -498,9 +531,12 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
     let currentTextPart: MessageTextPart | undefined
     let currentReasoningPart: MessageReasoningPart | undefined
 
+    resetTimeout()
+
     try {
       for await (const chunk of result.fullStream) {
         // console.debug('stream chunk', chunk)
+        resetTimeout()
 
         // Handle error chunks
         if (chunk.type === 'error') {
@@ -520,11 +556,26 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
         options.onResultChange?.({ contentParts })
       }
     } catch (error) {
+      clearTimeout(timeoutHandle)
       // Ensure reasoning parts get their duration set even if streaming is interrupted
       if (currentReasoningPart?.startTime && !currentReasoningPart.duration) {
         currentReasoningPart.duration = Date.now() - currentReasoningPart.startTime
       }
+      // If our inactivity timer fired (and the user didn't cancel), surface a clear error.
+      if (timeoutController.signal.aborted && !options.signal?.aborted) {
+        const elapsed = contentParts.length > 0 ? 'mid-stream' : 'before first token'
+        throw new NetworkError(
+          `Stream stalled ${elapsed}: no data received for ${CHUNK_INACTIVITY_TIMEOUT_MS / 1000}s`,
+          'stream'
+        )
+      }
       throw error
+    } finally {
+      clearTimeout(timeoutHandle)
+    }
+
+    if (contentParts.length === 0) {
+      throw new ApiError('Empty response: the model returned no content')
     }
 
     return this.finalizeResult(
