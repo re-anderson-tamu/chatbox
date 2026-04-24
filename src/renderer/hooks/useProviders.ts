@@ -2,10 +2,8 @@ import { SystemProviders } from '@shared/defaults'
 import { ModelProviderEnum, type ProviderInfo } from '@shared/types'
 import { useCallback, useMemo } from 'react'
 import { useSettingsStore } from '@/stores/settingsStore'
-import useChatboxAIModels from './useChatboxAIModels'
 
 export const useProviders = () => {
-  const { chatboxAIModels } = useChatboxAIModels()
   const { setSettings, ...settings } = useSettingsStore((state) => state)
   const providerSettingsMap = settings.providers
 
@@ -22,7 +20,7 @@ export const useProviders = () => {
             return {
               ...p,
               ...providerSettings,
-              models: chatboxAIModels,
+              models: [],
             }
           } else if (
             (!p.isCustom && providerSettings?.apiKey) ||
@@ -40,7 +38,7 @@ export const useProviders = () => {
           }
         })
         .filter((p) => !!p),
-    [providerSettingsMap, allProviderBaseInfos, chatboxAIModels, settings.licenseKey]
+    [providerSettingsMap, allProviderBaseInfos, settings.licenseKey]
   )
 
   const favoritedModels = useMemo(

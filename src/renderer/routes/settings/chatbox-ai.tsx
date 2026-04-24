@@ -2,7 +2,6 @@ import { Stack, Transition } from '@mantine/core'
 import { type ModelProvider, ModelProviderEnum } from '@shared/types'
 import { createFileRoute } from '@tanstack/react-router'
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
-import useChatboxAIModels from '@/hooks/useChatboxAIModels'
 import { useLanguage, useProviderSettings, useSettingsStore } from '@/stores/settingsStore'
 import { VIEW_TRANSITION_DURATION, VIEW_TRANSITION_TIMING } from './provider/chatbox-ai/-components/constants'
 import { LicenseKeyView } from './provider/chatbox-ai/-components/LicenseKeyView'
@@ -36,8 +35,6 @@ export function RouteComponent() {
 
   const { isLoggedIn, clearAuthTokens, saveAuthTokens } = useAuthTokens()
   const licenseKey = useSettingsStore((state) => state.licenseKey)
-
-  const { allChatboxAIModels, chatboxAIModels, refetch: refetchChatboxAIModels } = useChatboxAIModels()
 
   const deleteModel = (modelId: string) => {
     setProviderSettings({
@@ -201,11 +198,11 @@ export function RouteComponent() {
       </div>
 
       <ModelManagement
-        chatboxAIModels={chatboxAIModels}
-        allChatboxAIModels={allChatboxAIModels}
+        chatboxAIModels={[]}
+        allChatboxAIModels={[]}
         onDeleteModel={deleteModel}
         onResetModels={resetModels}
-        onFetchModels={refetchChatboxAIModels}
+        onFetchModels={() => {}}
         onAddModel={(model) =>
           setProviderSettings({
             excludedModels: (providerSettings?.excludedModels || []).filter((m) => m !== model.modelId),
