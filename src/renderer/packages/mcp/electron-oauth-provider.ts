@@ -10,7 +10,7 @@ export class ElectronOAuthProvider implements OAuthClientProvider {
     private readonly serverId: string,
     private readonly serverName: string,
     private readonly preConfiguredClientId?: string,
-    private readonly preConfiguredClientSecret?: string,
+    private readonly preConfiguredClientSecret?: string
   ) {
     this._state = crypto.randomUUID()
   }
@@ -74,9 +74,17 @@ export class ElectronOAuthProvider implements OAuthClientProvider {
 
   async saveTokens(tokens: OAuthTokens) {
     await window.electronAPI.invoke('setStoreBlob', `mcp-oauth-tokens-${this.serverId}`, JSON.stringify(tokens))
+    /*
+	try {
+      const payload = JSON.parse(atob(tokens.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+      await window.electronAPI.invoke('setStoreBlob', `debug-token-claims-${this.serverId}`, JSON.stringify(payload, null, 2))
+    } catch {
+      await window.electronAPI.invoke('setStoreBlob', `debug-token-claims-${this.serverId}`, tokens.access_token)
+    }*/
   }
 
   async redirectToAuthorization(authorizationUrl: URL) {
+    //await window.electronAPI.invoke('setStoreBlob', `debug-auth-url-${this.serverId}`, authorizationUrl.toString())
     // Ask the main process to wait for the OAuth callback on the localhost server.
     // This promise resolves when the provider redirects back to our localhost URL.
     this._codePromise = window.electronAPI.invoke('mcp:oauth-wait-callback', this._state)
