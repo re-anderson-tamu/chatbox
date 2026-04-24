@@ -47,7 +47,7 @@ export function useRemoteCopilots() {
   const language = useLanguage()
   const { data: copilots, ...others } = useQuery({
     queryKey: ['remote-copilots', language],
-    queryFn: () => remote.listCopilots(language),
+    queryFn: () => [],
     initialData: [],
     initialDataUpdatedAt: 0,
     staleTime: 3600 * 1000,

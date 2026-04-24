@@ -159,18 +159,6 @@ export async function checkNeedUpdate(version: string, os: string, config: Confi
 //     return res['data'] || []
 // }
 
-export async function listCopilots(lang: string) {
-  type Response = {
-    data: CopilotDetail[]
-  }
-  const res = await ofetch<Response>(`${getAPIOrigin()}/api/copilots/list`, {
-    method: 'POST',
-    retry: 3,
-    body: { lang },
-  })
-  return res.data
-}
-
 export async function recordCopilotShare(detail: CopilotDetail) {
   await ofetch(`${getAPIOrigin()}/api/copilots/share-record`, {
     method: 'POST',
